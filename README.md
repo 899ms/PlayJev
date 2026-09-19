@@ -45,7 +45,7 @@ docker compose up -d --build
 # 打开 http://localhost:10010(端口可用 PLAYJEV_PORT 环境变量覆盖)
 ```
 
-基于 Bun:构建阶段 `bun install && bun run build`,代理服务用 `bun server/proxy.mjs`。
+基于 Bun:构建阶段 `bun install && bun --filter @playjev/web build`,代理服务用 `bun server/proxy.mjs`。
 包含两个服务:`web`(nginx 托管静态构建)与 `proxy`(内置转发 Jev / LLM API)。
 所有网络请求固定走同源反代(`/api/jev/systemone`、`/api/llm`),不存在 CORS 问题,
 无需任何手动代理配置——首次引导里配好密钥即可直接发送。

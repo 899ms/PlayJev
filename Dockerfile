@@ -8,7 +8,7 @@ COPY apps/web/package.json apps/web/
 RUN bun install
 
 COPY . .
-RUN bun run build
+RUN bun --filter @playjev/web build
 
 # ---- runtime stage: nginx serves the static build and routes /api to the proxy ----
 FROM nginx:1.27-alpine
