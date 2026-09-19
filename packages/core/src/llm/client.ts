@@ -106,47 +106,81 @@ export async function chatComplete(cfg: LlmClientConfig, messages: LlmMessage[],
   return extractText(json);
 }
 
+function collectContentTexts(content: unknown): string[] {
+  if (!Array.isArray(content)) return [];
+  const out: string[] = [];
+  for (const part of content as Array<Record<string, unknown>>) {
+    // { type: "text", text } (Anthropic / Responses output) and
+    // { type: "output_text", text } (Responses nested message content)
+    if (
+      (part?.type === "text" || part?.type === "output_text") &&
+      typeof part?.text === "string"
+    ) {
+      out.push(part.text);
+    }
+  }
+  return out;
+}
+
 function extractText(json: unknown): string {
   const rec = json as Record<string, unknown>;
   // 1. Direct output_text (OpenAI Responses API)
   if (typeof rec?.output_text === "string" && rec.output_text.trim() !== "") {
     return rec.output_text;
   }
-  // 2. OpenAI Chat: choices[0].message.content
-  const choices = rec?.choices as Array<Record<string, unknown>> | undefined;
-  const message = choices?.[0]?.message as Record<string, unknown> | undefined;
-  if (typeof message?.content === "string") return message.content;
-  // 3. OpenAI Responses API nested output: output[].content[].text
+  // 2. OpenAI Chat: choices[0].message.content (string or content-part array).
+  // Also tolerates legacy choices[0].text and data.choices wrappers from
+  // OpenAI-compatible third-party providers.
+  const choiceLists = [rec?.choices, (rec?.data as Record<string, unknown> | undefined)?.choices];
+  for (const list of choiceLists) {
+    if (!Array.isArray(list)) continue;
+    const first = list[0] as Record<string, unknown> | undefined;
+    const message = first?.message as Record<string, unknown> | undefined;
+    if (typeof message?.content === "string" && message.content !== "") return message.content;
+    const nested = collectContentTexts(message?.content);
+    if (nested.length > 0) return nested.join("");
+    // reasoning models sometimes put the answer in reasoning_content
+    if (typeof message?.reasoning_content === "string" && message.reasoning_content.trim() !== "") {
+      const fallback = collectContentTexts((first as Record<string, unknown>)?.content);
+      if (fallback.length === 0) return message.reasoning_content;
+    }
+    if (typeof first?.text === "string" && (first.text as string) !== "") {
+      return first.text as string;
+    }
+  }
+  // 3. OpenAI Responses API nested output: output[].content[].text|output_text.
+  // Reasoning summaries (type summary/output_text without message wrapper) count too.
   const output = rec?.output as Array<Record<string, unknown>> | undefined;
   if (Array.isArray(output)) {
     const textParts: string[] = [];
     for (const item of output) {
-      const itemContent = item?.content as Array<Record<string, unknown>> | undefined;
-      if (Array.isArray(itemContent)) {
-        for (const c of itemContent) {
-          if (c?.type === "text" && typeof c?.text === "string") {
-            textParts.push(c.text);
-          }
-        }
+      textParts.push(...collectContentTexts(item?.content));
+      if (typeof item?.text === "string" && (item.text as string) !== "") {
+        textParts.push(item.text as string);
       }
     }
     if (textParts.length > 0) return textParts.join("");
   }
   // 4. Anthropic: content[].text
-  const content = rec?.content as Array<Record<string, unknown>> | undefined;
-  if (Array.isArray(content)) {
-    const text = content
-      .filter((part) => part?.type === "text" && typeof part.text === "string")
-      .map((part) => part.text)
-      .join("");
-    if (text) return text;
+  const anthropic = collectContentTexts(rec?.content);
+  if (anthropic.length > 0) return anthropic.join("");
+  // 5. Common custom wrapper / proxy fields: response, result, text, message, output
+  for (const key of ["response", "result", "text", "message", "output"] as const) {
+    if (typeof rec?.[key] === "string" && (rec[key] as string).trim() !== "") {
+      return rec[key] as string;
+    }
   }
-  // 5. Common custom wrapper / proxy fields: response, result, text
-  if (typeof rec?.response === "string") return rec.response;
-  if (typeof rec?.result === "string") return rec.result;
-  if (typeof rec?.text === "string") return rec.text;
 
-  throw new LlmError("Unrecognized LLM response shape");
+  // 6. Give up — but include a truncated dump of the top-level keys and a
+  // body preview so the user can report / adapt instead of guessing blind.
+  const keys = rec && typeof rec === "object" ? Object.keys(rec).join(",") : typeof json;
+  let preview = "";
+  try {
+    preview = JSON.stringify(json)?.slice(0, 300) ?? "";
+  } catch {
+    preview = String(json).slice(0, 300);
+  }
+  throw new LlmError(`Unrecognized LLM response shape (keys: ${keys}): ${preview}`);
 }
 
 /**

@@ -102,6 +102,50 @@ describe("chatComplete", () => {
     expect(text).toBe("bonjour");
   });
 
+  it("reads legacy choices[0].text (third-party compat)", async () => {
+    const text = await chatComplete(
+      { protocol: "openai", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      { fetchImpl: fetchJson({ choices: [{ text: "legacy hello" }] }) }
+    );
+    expect(text).toBe("legacy hello");
+  });
+
+  it("reads data.choices wrapper", async () => {
+    const text = await chatComplete(
+      { protocol: "openai", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      { fetchImpl: fetchJson({ data: { choices: [{ message: { content: "wrapped" } }] } }) }
+    );
+    expect(text).toBe("wrapped");
+  });
+
+  it("reads output_text content parts in Responses output", async () => {
+    const text = await chatComplete(
+      { protocol: "response", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      {
+        fetchImpl: fetchJson({
+          output: [{ type: "message", content: [{ type: "output_text", text: "resp text" }] }],
+        }),
+      }
+    );
+    expect(text).toBe("resp text");
+  });
+
+  it("reads array message content parts in Chat replies", async () => {
+    const text = await chatComplete(
+      { protocol: "openai", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      {
+        fetchImpl: fetchJson({
+          choices: [{ message: { content: [{ type: "text", text: "part hello" }] } }],
+        }),
+      }
+    );
+    expect(text).toBe("part hello");
+  });
+
   it("throws LlmError on unrecognized shapes", async () => {
     await expect(
       chatComplete(
