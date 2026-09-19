@@ -7,6 +7,7 @@ import {
   addStateChild,
   convertStateAt,
   convertStateRoot,
+  moveStateAcross,
   moveStateAt,
   removeStateAt,
   renameStateKey,
@@ -96,6 +97,7 @@ export interface ProjectActions {
   addStateChildNode(parentSegs: PathSeg[], key?: string): void;
   removeStateNode(segs: PathSeg[]): void;
   moveStateNode(segs: PathSeg[], dir: -1 | 1): void;
+  moveStateNodeAcross(from: PathSeg[], toParentSegs: PathSeg[], toIndex?: number): void;
   convertStateNodeKind(segs: PathSeg[], kind: NodeKind): void;
   convertStateRoot(kind: RootKind): void;
   setQuestionTab(tab: QuestionTab): void;
@@ -415,6 +417,8 @@ export function createProjectStore(storage: KeyValueStorage) {
           mutateState(set, get, (state) => addStateChild(state, parentSegs, key)),
         removeStateNode: (segs) => mutateState(set, get, (state) => removeStateAt(state, segs)),
         moveStateNode: (segs, dir) => mutateState(set, get, (state) => moveStateAt(state, segs, dir)),
+        moveStateNodeAcross: (from, toParentSegs, toIndex) =>
+          mutateState(set, get, (state) => moveStateAcross(state, from, toParentSegs, toIndex).state),
         convertStateNodeKind: (segs, kind) => mutateState(set, get, (state) => convertStateAt(state, segs, kind)),
         convertStateRoot: (kind) => mutateState(set, get, (state) => convertStateRoot(state, kind)),
 

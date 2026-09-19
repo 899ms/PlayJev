@@ -94,6 +94,10 @@ export const zhTW: Dictionary = {
   "state.kind.array": "陣列",
   "state.keyRequired": "欄位名稱不能為空或重複",
   "state.copyPath": "複製路徑",
+  "state.moveOut": "移出一層",
+  "state.moveHere": "移動到這裡",
+  "state.moving": "正在移動 {path} —— 選擇目標位置",
+  "state.cancelMove": "取消移動",
   "state.chars": "{count} 字元",
 
   // questions pane

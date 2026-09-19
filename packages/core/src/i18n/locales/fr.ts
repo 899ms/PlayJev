@@ -94,6 +94,10 @@ export const fr: Dictionary = {
   "state.kind.array": "tableau",
   "state.keyRequired": "Le nom du champ doit être non vide et unique",
   "state.copyPath": "Copier le chemin",
+  "state.moveOut": "Remonter d’un niveau",
+  "state.moveHere": "Déplacer ici",
+  "state.moving": "Déplacement de {path} — choisir la destination",
+  "state.cancelMove": "Annuler le déplacement",
   "state.chars": "{count} caractères",
 
   // questions pane

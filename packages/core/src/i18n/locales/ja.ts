@@ -94,6 +94,10 @@ export const ja: Dictionary = {
   "state.kind.array": "配列",
   "state.keyRequired": "フィールド名は空でなく一意である必要があります",
   "state.copyPath": "パスをコピー",
+  "state.moveOut": "1つ外に移動",
+  "state.moveHere": "ここに移動",
+  "state.moving": "{path} を移動中 —— 移動先を選択",
+  "state.cancelMove": "移動をキャンセル",
   "state.chars": "{count} 文字",
 
   // questions pane

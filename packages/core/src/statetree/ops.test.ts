@@ -4,6 +4,7 @@ import {
   convertStateAt,
   convertStateRoot,
   getStateAt,
+  moveStateAcross,
   moveStateAt,
   removeStateAt,
   renameStateKey,
@@ -90,6 +91,56 @@ describe("removeStateAt / moveStateAt", () => {
     expect(moved.order.charges[0].amount_usd).toBe(49);
     const reordered = moveStateAt(state, ["order"], -1) as typeof state;
     expect(Object.keys(reordered)).toEqual(["order", "ticket", "refund_policy"]);
+  });
+});
+
+describe("moveStateAcross", () => {
+  it("moves a leaf into another object with a unique key", () => {
+    const { state: next, segs } = moveStateAcross(state, ["refund_policy"], ["ticket"]);
+    const typed = next as typeof state;
+    expect("refund_policy" in typed).toBe(false);
+    expect(getStateAt(next, ["ticket", "refund_policy"])).toBe(state.refund_policy);
+    expect(segs).toEqual(["ticket", "refund_policy"]);
+    expect(getStateAt(state, ["refund_policy"])).toBe(state.refund_policy); // immutable
+  });
+
+  it("keeps the key when moving within the same parent", () => {
+    const { state: next, segs } = moveStateAcross(
+      state,
+      ["ticket", "messages", 0, "text"],
+      ["ticket", "messages", 0],
+      0
+    );
+    const msg = getStateAt(next, ["ticket", "messages", 0]) as Record<string, unknown>;
+    expect(Object.keys(msg)).toEqual(["text", "from"]);
+    expect(segs).toEqual(["ticket", "messages", 0, "text"]);
+  });
+
+  it("suffixes the key on cross-parent collision", () => {
+    // "order" moved into ticket.messages[0] as { order: <text> } would collide
+    // with nothing; instead move "ticket" (object) into the message which
+    // already has "text" — use a leaf that collides: move refund_policy text
+    // into a target that already has that key name.
+    const base = { a: { x: 1 }, b: { x: 2 } };
+    const { state: next, segs } = moveStateAcross(base, ["a", "x"], ["b"]);
+    expect(getStateAt(next, ["b", "x_2"])).toBe(1);
+    expect(getStateAt(next, ["a"])).toEqual({});
+    expect(segs).toEqual(["b", "x_2"]);
+  });
+
+  it("inserts into arrays at the given index", () => {
+    const { state: next, segs } = moveStateAcross(state, ["refund_policy"], ["order", "charges"], 0);
+    const typed = next as typeof state;
+    expect(typed.order.charges[0]).toBe(state.refund_policy);
+    expect(typed.order.charges.length).toBe(3);
+    expect(segs).toEqual(["order", "charges", 0]);
+  });
+
+  it("no-ops into its own subtree, onto primitives, or for the root", () => {
+    expect(moveStateAcross(state, ["ticket"], ["ticket", "messages"]).state).toBe(state);
+    expect(moveStateAcross(state, ["ticket"], ["refund_policy"]).state).toBe(state);
+    expect(moveStateAcross(state, [], ["order"]).state).toBe(state);
+    expect(moveStateAcross(state, ["nope"], ["order"]).state).toBe(state);
   });
 });
 

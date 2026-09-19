@@ -92,6 +92,10 @@ export const zhCN: Dictionary = {
   "state.kind.array": "数组",
   "state.keyRequired": "字段名不能为空或重复",
   "state.copyPath": "复制路径",
+  "state.moveOut": "移出一层",
+  "state.moveHere": "移动到这里",
+  "state.moving": "正在移动 {path} —— 选择目标位置",
+  "state.cancelMove": "取消移动",
   "state.chars": "{count} 字符",
 
   // questions pane

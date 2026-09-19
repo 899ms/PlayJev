@@ -94,6 +94,10 @@ export const de: Dictionary = {
   "state.kind.array": "array",
   "state.keyRequired": "Feldname muss eindeutig und nicht leer sein",
   "state.copyPath": "Pfad kopieren",
+  "state.moveOut": "Eine Ebene nach außen verschieben",
+  "state.moveHere": "Hierher verschieben",
+  "state.moving": "{path} wird verschoben — Ziel wählen",
+  "state.cancelMove": "Verschieben abbrechen",
   "state.chars": "{count} Zeichen",
 
   // questions pane

@@ -100,6 +100,59 @@ export function removeStateAt(state: StateValue, segs: PathSeg[]): StateValue {
   return state;
 }
 
+/** Detach the node at `from` (returns [stateWithoutNode, detachedValue]). */
+function detachStateAt(state: StateValue, segs: PathSeg[]): [StateValue, unknown] {
+  if (segs.length === 0) return [state, state];
+  const value = getStateAt(state, segs);
+  if (value === undefined) return [state, undefined];
+  return [removeStateAt(state, segs), value];
+}
+
+/**
+ * Move a node across hierarchy levels: detach from `from`, then insert into the
+ * container at `toParentSegs` at position `toIndex` (clamped to the end).
+ * Object targets get an auto-unique key derived from the moved entry (leaf arrays
+ * append as values). No-op when paths are invalid or the target sits inside the
+ * moved subtree. Returns { state, segs } with the node's new path (for UI focus).
+ */
+export function moveStateAcross(
+  state: StateValue,
+  from: PathSeg[],
+  toParentSegs: PathSeg[],
+  toIndex?: number
+): { state: StateValue; segs: PathSeg[] } {
+  if (from.length === 0) return { state, segs: from };
+  // Target inside (or equal to) the moved subtree → would orphan content.
+  if (toParentSegs.length >= from.length && toParentSegs.slice(0, from.length).every((s, i) => s === from[i])) {
+    return { state, segs: from };
+  }
+  const [detached, value] = detachStateAt(state, from);
+  if (value === undefined) return { state, segs: from };
+  const target = getStateAt(detached, toParentSegs);
+  if (Array.isArray(target)) {
+    const idx = toIndex === undefined ? target.length : Math.max(0, Math.min(toIndex, target.length));
+    const next = target.slice();
+    next.splice(idx, 0, value as EntryValue);
+    const newState = setStateAt(detached, toParentSegs, next);
+    return { state: newState === detached ? state : newState, segs: [...toParentSegs, idx] };
+  }
+  if (isPlainObject(target)) {
+    const fromKey = typeof from[from.length - 1] === "string" ? (from[from.length - 1] as string) : "field";
+    let name = fromKey;
+    if (name in target) {
+      let n = 2;
+      name = `${fromKey}_${n}`;
+      while (name in target) name = `${fromKey}_${++n}`;
+    }
+    const entries = Object.entries(target);
+    const idx = toIndex === undefined ? entries.length : Math.max(0, Math.min(toIndex, entries.length));
+    entries.splice(idx, 0, [name, value as EntryValue]);
+    const newState = setStateAt(detached, toParentSegs, Object.fromEntries(entries));
+    return { state: newState === detached ? state : newState, segs: [...toParentSegs, name] };
+  }
+  return { state, segs: from };
+}
+
 /** Swap a node with its previous/next sibling within the same parent. */
 export function moveStateAt(state: StateValue, segs: PathSeg[], dir: -1 | 1): StateValue {
   if (segs.length === 0) return state;

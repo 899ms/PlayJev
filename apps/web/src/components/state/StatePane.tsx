@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, CornerUpLeft, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useT, projectStore, useProject, useActions } from "@/hooks";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -88,6 +88,8 @@ function TreeMode() {
   const t = useT();
   const state = useProject((s) => s.project.state);
   const actions = useActions();
+  const [movingSegs, setMovingSegs] = useState<PathSeg[] | null>(null);
+  const movingPath = movingSegs ? buildTree(state).length ? movingSegs.join("/") : "" : "";
 
   if (typeof state === "string") {
     if (state.trim() === "") {
@@ -128,12 +130,40 @@ function TreeMode() {
   const root = buildTree(state)[0];
   if (!root) return <p className="text-sm text-zinc-400">{t("state.treeEmpty")}</p>;
 
+  const commitMove = (toParentSegs: PathSeg[], toIndex?: number) => {
+    if (movingSegs) {
+      actions.moveStateNodeAcross(movingSegs, toParentSegs, toIndex);
+      setMovingSegs(null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <p className="text-xs text-zinc-400">{t("state.treeHint")}</p>
+      {movingSegs && (
+        <div className="flex items-center gap-2 rounded-md border border-indigo-200 bg-indigo-50 px-2 py-1.5 text-xs text-indigo-700">
+          <span className="min-w-0 flex-1 truncate">{t("state.moving", { path: movingPath })}</span>
+          <button
+            type="button"
+            className="flex shrink-0 items-center gap-1 font-medium hover:text-indigo-900"
+            onClick={() => setMovingSegs(null)}
+          >
+            <X size={12} /> {t("state.cancelMove")}
+          </button>
+        </div>
+      )}
       <div className="font-mono text-[13px]">
         {root.children.map((child, i) => (
-          <TreeNodeRow key={child.path} node={child} index={i} parentKind={root.kind as "object" | "array"} depth={0} />
+          <TreeNodeRow
+            key={child.path}
+            node={child}
+            index={i}
+            parentKind={root.kind as "object" | "array"}
+            depth={0}
+            movingSegs={movingSegs}
+            onPickMove={setMovingSegs}
+            onCommitMove={commitMove}
+          />
         ))}
       </div>
       <div className="flex gap-3 pt-1">
@@ -167,21 +197,32 @@ function TreeNodeRow({
   index,
   parentKind,
   depth,
+  movingSegs,
+  onPickMove,
+  onCommitMove,
 }: {
   node: TreeNode;
   index: number;
   parentKind: "object" | "array" | "root";
   depth: number;
+  movingSegs: PathSeg[] | null;
+  onPickMove: (segs: PathSeg[]) => void;
+  onCommitMove: (toParentSegs: PathSeg[], toIndex?: number) => void;
 }) {
   const t = useT();
   const actions = useActions();
   const isContainer = node.kind === "object" || node.kind === "array";
   const childCount = node.children.length;
+  const isMoving = movingSegs !== null && JSON.stringify(movingSegs) === JSON.stringify(node.segments);
+  const isMoveTarget = movingSegs !== null && !isMoving;
 
   return (
     <div>
       <div
-        className="group flex flex-wrap items-center gap-1.5 rounded py-0.5 pr-1 hover:bg-zinc-50"
+        className={
+          "group flex flex-wrap items-center gap-1.5 rounded py-0.5 pr-1 " +
+          (isMoving ? "bg-indigo-50" : "hover:bg-zinc-50")
+        }
         style={{ paddingLeft: depth * 14 }}
       >
         {parentKind === "object" ? <KeyEditor node={node} /> : <span className="flex h-6 min-w-6 items-center justify-center rounded bg-zinc-100 px-1 text-xs text-zinc-500">{node.key}</span>}
@@ -213,6 +254,11 @@ function TreeNodeRow({
           <IconBtn title={t("question.moveDown")} onClick={() => actions.moveStateNode(node.segments, 1)}>
             <ArrowDown size={12} />
           </IconBtn>
+          {depth > 0 && !isMoving && (
+            <IconBtn title={t("state.moveOut")} onClick={() => onPickMove(node.segments)}>
+              <CornerUpLeft size={12} />
+            </IconBtn>
+          )}
           <IconBtn title={t("question.delete")} destructive onClick={() => actions.removeStateNode(node.segments)}>
             <Trash2 size={12} />
           </IconBtn>
@@ -228,18 +274,23 @@ function TreeNodeRow({
               index={i}
               parentKind={node.kind === "object" ? "object" : "array"}
               depth={depth + 1}
+              movingSegs={movingSegs}
+              onPickMove={onPickMove}
+              onCommitMove={onCommitMove}
             />
           ))}
-          {node.kind === "object" && node.children.length === 0 && (
-            <div style={{ paddingLeft: (depth + 1) * 14 + 4 }} className="py-0.5">
-              <AddChildButton segs={node.segments} kind="object" />
-            </div>
-          )}
-          {node.kind === "array" && node.children.length === 0 && (
-            <div style={{ paddingLeft: (depth + 1) * 14 + 4 }} className="py-0.5">
-              <AddChildButton segs={node.segments} kind="array" />
-            </div>
-          )}
+          <div style={{ paddingLeft: (depth + 1) * 14 + 4 }} className="flex items-center gap-2 py-0.5">
+            <AddChildButton segs={node.segments} kind={node.kind === "object" ? "object" : "array"} />
+            {isMoveTarget && (
+              <button
+                type="button"
+                className="text-xs font-medium text-emerald-600 hover:text-emerald-500"
+                onClick={() => onCommitMove(node.segments)}
+              >
+                {t("state.moveHere")}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

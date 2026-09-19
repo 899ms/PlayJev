@@ -62,6 +62,7 @@ export {
   addStateChild,
   removeStateAt,
   moveStateAt,
+  moveStateAcross,
   convertStateAt,
   convertStateRoot,
 } from "./statetree/ops";
