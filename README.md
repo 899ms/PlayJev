@@ -14,7 +14,7 @@ Any LLM can draft the whole request from one sentence.
 [![Cloudflare Workers](https://img.shields.io/badge/cloudflare-workers%20%7C%20pages-orange.svg)](wrangler.toml)
 [![i18n](https://img.shields.io/badge/i18n-6%20locales-purple.svg)](#-features)
 
-[Getting Started](#-quick-start) · [Deployment](#-deployment) · [Design](./DESIGN.md) · [Docs mirror](./docs/jev/README.md)
+[中文版](./README.zh-CN.md) · [Getting Started](#-quick-start) · [Deployment](#-deployment) · [Design](./DESIGN.md) · [Docs mirror](./docs/jev/README.md)
 
 </div>
 
