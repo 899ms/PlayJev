@@ -1,0 +1,108 @@
+import { ListChecks, CircleCheck, Gauge, Plus } from "lucide-react";
+import type { QuestionTab, QuestionType } from "@playjev/core";
+import { useProject, useT, useActions } from "@/hooks";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/field";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { QuestionCard } from "./QuestionCard";
+import { cn } from "@/lib/utils";
+
+/**
+ * Questions section: builder (visual cards) ⇄ questions-JSON editing.
+ * Adding questions goes through a dropdown menu.
+ */
+export function QuestionSection({ className }: { className?: string }) {
+  const t = useT();
+  const questionTab = useProject((s) => s.view.questionTab);
+  const actions = useActions();
+
+  return (
+    <section className={cn("flex min-h-0 flex-1 flex-col", className)}>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-1">
+        <h2 className="text-sm font-semibold text-zinc-800">{t("questions.title")}</h2>
+        <div className="flex items-center gap-1.5">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm">
+                <Plus size={14} /> {t("questions.add")}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => actions.addQuestion("choice")}>
+                <ListChecks size={14} className="text-indigo-500" /> {t("questions.addChoice")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => actions.addQuestion("score")}>
+                <Gauge size={14} className="text-amber-500" /> {t("questions.addScore")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => actions.addQuestion("noul")}>
+                <CircleCheck size={14} className="text-emerald-500" /> {t("questions.addNoul")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Tabs
+            value={questionTab}
+            onValueChange={(id) => actions.setQuestionTab(id as QuestionTab)}
+          >
+            <TabsList>
+              <TabsTrigger value="builder">{t("question.tabBuilder")}</TabsTrigger>
+              <TabsTrigger value="json">{t("question.tabJson")}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+      {questionTab === "builder" ? <QuestionList /> : <QuestionJsonMode />}
+    </section>
+  );
+}
+
+function QuestionJsonMode() {
+  const t = useT();
+  const questionJsonText = useProject((s) => s.view.questionJsonText);
+  const questionJsonValid = useProject((s) => s.view.questionJsonValid);
+  const questionJsonError = useProject((s) => s.view.questionJsonError);
+  const actions = useActions();
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <Textarea
+        className={cn(
+          "min-h-56 flex-1 resize-none font-mono text-[13px] leading-relaxed",
+          !questionJsonValid && "border-red-400 focus:border-red-500 focus:ring-red-400"
+        )}
+        spellCheck={false}
+        value={questionJsonText}
+        onChange={(e) => actions.setQuestionJsonText(e.target.value)}
+      />
+      <p className={cn("text-xs", questionJsonValid ? "text-zinc-400" : "text-red-600")}>
+        {questionJsonValid ? t("question.jsonHint") : t("question.jsonInvalid", { error: questionJsonError ?? "" })}
+      </p>
+    </div>
+  );
+}
+
+/** The question cards themselves (builder tab body). */
+export function QuestionList() {
+  const t = useT();
+  const questions = useProject((s) => s.project.questions);
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-400">
+        {t("questions.empty")}
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-3">
+      {questions.map((q, index) => (
+        <QuestionCard key={q.id} question={q} index={index} total={questions.length} />
+      ))}
+    </div>
+  );
+}

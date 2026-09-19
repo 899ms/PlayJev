@@ -1,0 +1,90 @@
+import { describe, expect, it } from "vitest";
+import { chatComplete, extractJsonBlock, LlmError } from "./client";
+import { defaultBackoffMs } from "../jev/client";
+import { mockEvaluate } from "../jev/mock";
+import type { JevRequest } from "../types/api";
+
+describe("extractJsonBlock", () => {
+  it("parses a bare JSON object", () => {
+    expect(extractJsonBlock('{"a":1}')).toEqual({ a: 1 });
+  });
+
+  it("parses a fenced JSON block with prose around it", () => {
+    const reply = 'Here you go:\n```json\n{"questions": []}\n```\nDone.';
+    expect(extractJsonBlock(reply)).toEqual({ questions: [] });
+  });
+
+  it("falls back to the outermost braces", () => {
+    const reply = 'Sure! {"name":"x","nested":{"a":1}} hope that helps';
+    expect(extractJsonBlock(reply)).toEqual({ name: "x", nested: { a: 1 } });
+  });
+
+  it("throws a SyntaxError when nothing parseable exists", () => {
+    expect(() => extractJsonBlock("no json here")).toThrow(SyntaxError);
+  });
+});
+
+describe("chatComplete", () => {
+  const fetchJson = (body: unknown) =>
+    (async () =>
+      new Response(JSON.stringify(body), { status: 200, headers: { "Content-Type": "application/json" } })) as unknown as typeof fetch;
+
+  it("reads OpenAI-shaped replies", async () => {
+    const text = await chatComplete(
+      { protocol: "openai", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      { fetchImpl: fetchJson({ choices: [{ message: { content: "hello" } }] }) }
+    );
+    expect(text).toBe("hello");
+  });
+
+  it("reads Anthropic-shaped replies", async () => {
+    const text = await chatComplete(
+      { protocol: "anthropic", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      { fetchImpl: fetchJson({ content: [{ type: "text", text: "bonjour" }] }) }
+    );
+    expect(text).toBe("bonjour");
+  });
+
+  it("throws LlmError on unrecognized shapes", async () => {
+    await expect(
+      chatComplete(
+        { protocol: "openai", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+        [{ role: "user", content: "hi" }],
+        { fetchImpl: fetchJson({ weird: true }) }
+      )
+    ).rejects.toBeInstanceOf(LlmError);
+  });
+});
+
+describe("defaultBackoffMs", () => {
+  it("honors the retry-after header (seconds)", () => {
+    expect(defaultBackoffMs(0, "3")).toBe(3000);
+  });
+
+  it("falls back to exponential backoff", () => {
+    expect(defaultBackoffMs(0, null)).toBe(1000);
+    expect(defaultBackoffMs(1, null)).toBe(2000);
+  });
+});
+
+describe("mockEvaluate", () => {
+  it("answers every question with the right answer type", () => {
+    const request: JevRequest = {
+      state: "s",
+      model: "jev-latest",
+      questions: {
+        c: { type: "choice", instructions: "?", criteria: { a: "x", b: "y" } },
+        s: { type: "score", instructions: "?", criteria: ["l0", "l1", "l2"] },
+        n: { type: "noul", instructions: "?" },
+      },
+    };
+    const res = mockEvaluate(request);
+    expect(Object.keys(res.answers)).toEqual(["c", "s", "n"]);
+    expect(res.answers["c"]!.type).toBe("choice");
+    expect(res.answers["s"]!.type).toBe("score");
+    expect(res.answers["n"]!.type).toBe("noul");
+    expect(res.usage?.input_tokens).toBeGreaterThan(0);
+  });
+});
