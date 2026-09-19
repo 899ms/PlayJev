@@ -153,7 +153,7 @@ export const zhCN: Dictionary = {
   "response.confidence.mediumAction": "建议复核",
   "response.confidence.lowAction": "建议转人工",
   "response.confidence": "置信度",
-  "noul.value": "yes 概率",
+  "noul.value": "概率",
   "noul.uncertain": "接近 0.5,模型无法判断",
   "noul.strongYes": "强 yes",
   "noul.strongNo": "强 no",

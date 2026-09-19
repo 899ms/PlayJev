@@ -155,7 +155,7 @@ export const ja: Dictionary = {
   "response.confidence.mediumAction": "確認してから実行",
   "response.confidence.lowAction": "人間へのエスカレーション推奨",
   "response.confidence": "信頼度",
-  "noul.value": "P(yes)",
+  "noul.value": "確率",
   "noul.uncertain": "0.5 に近く — モデルは判断できません",
   "noul.strongYes": "強い yes",
   "noul.strongNo": "強い no",

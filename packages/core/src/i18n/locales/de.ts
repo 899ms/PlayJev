@@ -155,7 +155,7 @@ export const de: Dictionary = {
   "response.confidence.mediumAction": "Vor dem Handeln prüfen",
   "response.confidence.lowAction": "An einen Menschen weiterleiten",
   "response.confidence": "Konfidenz",
-  "noul.value": "P(yes)",
+  "noul.value": "Wahrscheinlichkeit",
   "noul.uncertain": "Nahe 0,5 — das Modell kann es nicht unterscheiden",
   "noul.strongYes": "Klares Ja",
   "noul.strongNo": "Klares Nein",

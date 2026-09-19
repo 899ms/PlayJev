@@ -155,7 +155,7 @@ export const zhTW: Dictionary = {
   "response.confidence.mediumAction": "建議複核",
   "response.confidence.lowAction": "建議轉人工",
   "response.confidence": "信心度",
-  "noul.value": "yes 機率",
+  "noul.value": "機率",
   "noul.uncertain": "接近 0.5,模型無法判斷",
   "noul.strongYes": "強 yes",
   "noul.strongNo": "強 no",

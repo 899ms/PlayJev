@@ -155,7 +155,7 @@ export const en: Dictionary = {
   "response.confidence.mediumAction": "Review before acting",
   "response.confidence.lowAction": "Route to a human",
   "response.confidence": "Confidence",
-  "noul.value": "P(yes)",
+  "noul.value": "Probability",
   "noul.uncertain": "Near 0.5 — the model cannot tell",
   "noul.strongYes": "Strong yes",
   "noul.strongNo": "Strong no",
