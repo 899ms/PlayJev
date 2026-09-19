@@ -190,6 +190,7 @@ export const ja: Dictionary = {
   "settings.mockMode": "デモモード(実 API 呼び出しなし)",
   "settings.protocol": "プロトコル",
   "settings.protocol.openai": "OpenAI 互換",
+  "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",
   "settings.model": "モデル",
@@ -208,8 +209,11 @@ export const ja: Dictionary = {
   "ai.step2Hint": "より良いドラフトのために AI が必要な情報です。",
   "ai.single": "単一選択",
   "ai.multi": "複数選択",
+  "ai.manualInput": "手動入力",
+  "ai.customInputPlaceholder": "カスタム回答や補足を入力…",
   "ai.step3Title": "生成されたドラフト",
   "ai.step3Hint": "ドラフトを確認し、適用後はエディタで微調整できます。",
+  "ai.copyAgentSchema": "Agent 用 Schema をコピー",
   "ai.draftQuestions": "{count} 件の質問",
   "ai.choiceOptions": "{count} 個の選択肢",
   "ai.scoreLevels": "{count} 段階のレベル",
@@ -241,6 +245,7 @@ export const ja: Dictionary = {
 
   // toasts
   "toast.copied": "クリップボードにコピーしました",
+  "toast.schemaCopied": "Agent 開発用 Schema をクリップボードにコピーしました",
   "toast.templateLoaded": "テンプレートを読み込みました",
   "toast.newProject": "新しい空白プロジェクトを作成しました",
   "toast.aiApplied": "AI ドラフトをエディタに適用しました",

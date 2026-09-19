@@ -190,6 +190,7 @@ export const en: Dictionary = {
   "settings.mockMode": "Demo mode (no real API calls)",
   "settings.protocol": "Protocol",
   "settings.protocol.openai": "OpenAI-compatible",
+  "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",
   "settings.model": "Model",
@@ -208,8 +209,11 @@ export const en: Dictionary = {
   "ai.step2Hint": "The AI needs these answers to produce a better draft.",
   "ai.single": "single choice",
   "ai.multi": "multi-select",
+  "ai.manualInput": "Custom answer",
+  "ai.customInputPlaceholder": "Enter custom answer or notes…",
   "ai.step3Title": "Generated draft",
   "ai.step3Hint": "Review the draft; after applying you can fine-tune everything in the editor.",
+  "ai.copyAgentSchema": "Copy Schema for Agent",
   "ai.draftQuestions": "{count} questions",
   "ai.choiceOptions": "{count} options",
   "ai.scoreLevels": "{count} levels",
@@ -241,6 +245,7 @@ export const en: Dictionary = {
 
   // toasts
   "toast.copied": "Copied to clipboard",
+  "toast.schemaCopied": "Agent development Schema copied to clipboard",
   "toast.templateLoaded": "Template loaded",
   "toast.newProject": "New blank project created",
   "toast.aiApplied": "AI draft applied to the editor",

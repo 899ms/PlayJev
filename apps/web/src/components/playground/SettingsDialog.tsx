@@ -205,12 +205,6 @@ function JevTab() {
           <option value="jev-1.13.0" />
         </datalist>
       </Row>
-      <Row label={t("settings.mockMode")}>
-        <div className="flex items-center gap-2">
-          <Switch checked={jev.mockMode} onCheckedChange={(v) => setJev({ mockMode: v })} />
-          <span className="text-xs text-zinc-400">{t("response.mockOn")}</span>
-        </div>
-      </Row>
       <ProxyRows
         useProxy={jev.useProxy}
         proxyOrigin={jev.proxyOrigin}
@@ -234,6 +228,7 @@ function LlmTab() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="openai">{t("settings.protocol.openai")}</SelectItem>
+            <SelectItem value="response">{t("settings.protocol.response")}</SelectItem>
             <SelectItem value="anthropic">{t("settings.protocol.anthropic")}</SelectItem>
           </SelectContent>
         </Select>
@@ -263,12 +258,6 @@ function LlmTab() {
       </Row>
       <Row label={t("settings.model")}>
         <Input className="font-mono text-xs" value={llm.model} onChange={(e) => setLlm({ model: e.target.value })} />
-      </Row>
-      <Row label={t("settings.mockMode")}>
-        <div className="flex items-center gap-2">
-          <Switch checked={llm.mockMode} onCheckedChange={(v) => setLlm({ mockMode: v })} />
-          <span className="text-xs text-zinc-400">{t("ai.mockHint")}</span>
-        </div>
       </Row>
       <ProxyRows
         useProxy={llm.useProxy}

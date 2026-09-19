@@ -4,7 +4,7 @@ export interface LlmMessage {
 }
 
 export interface LlmClientConfig {
-  protocol: "openai" | "anthropic";
+  protocol: "openai" | "response" | "anthropic";
   baseUrl: string;
   apiKey: string;
   model: string;
@@ -30,42 +30,62 @@ export interface ChatOptions {
 export async function chatComplete(cfg: LlmClientConfig, messages: LlmMessage[], opts?: ChatOptions): Promise<string> {
   const doFetch = opts?.fetchImpl ?? fetch;
   const base = cfg.baseUrl.replace(/\/+$/, "");
-  const res =
-    cfg.protocol === "anthropic"
-      ? await doFetch(`${base}/messages`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": cfg.apiKey,
-            "anthropic-version": "2023-06-01",
-            // required for direct browser calls
-            "anthropic-dangerous-direct-browser-access": "true",
-          },
-          body: JSON.stringify({
-            model: cfg.model,
-            max_tokens: opts?.maxTokens ?? 4096,
-            temperature: opts?.temperature ?? 0.7,
-            system: messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n") || undefined,
-            messages: messages
-              .filter((m) => m.role !== "system")
-              .map((m) => ({ role: m.role, content: m.content })),
-          }),
-          signal: opts?.signal,
-        })
-      : await doFetch(`${base}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
-          },
-          body: JSON.stringify({
-            model: cfg.model,
-            messages,
-            temperature: opts?.temperature ?? 0.7,
-            max_tokens: opts?.maxTokens ?? 4096,
-          }),
-          signal: opts?.signal,
-        });
+  let res: Response;
+
+  if (cfg.protocol === "anthropic") {
+    res = await doFetch(`${base}/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": cfg.apiKey,
+        "anthropic-version": "2023-06-01",
+        // required for direct browser calls
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        max_tokens: opts?.maxTokens ?? 4096,
+        temperature: opts?.temperature ?? 0.7,
+        system: messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n") || undefined,
+        messages: messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({ role: m.role, content: m.content })),
+      }),
+      signal: opts?.signal,
+    });
+  } else if (cfg.protocol === "response") {
+    const url = base.endsWith("/responses") ? base : `${base}/responses`;
+    res = await doFetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        input: messages.map((m) => ({ role: m.role, content: m.content })),
+        temperature: opts?.temperature ?? 0.7,
+        max_output_tokens: opts?.maxTokens ?? 4096,
+      }),
+      signal: opts?.signal,
+    });
+  } else {
+    const url = base.endsWith("/chat/completions") ? base : `${base}/chat/completions`;
+    res = await doFetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages,
+        temperature: opts?.temperature ?? 0.7,
+        max_tokens: opts?.maxTokens ?? 4096,
+      }),
+      signal: opts?.signal,
+    });
+  }
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -78,18 +98,44 @@ export async function chatComplete(cfg: LlmClientConfig, messages: LlmMessage[],
 
 function extractText(json: unknown): string {
   const rec = json as Record<string, unknown>;
-  // OpenAI: choices[0].message.content
+  // 1. Direct output_text (OpenAI Responses API)
+  if (typeof rec?.output_text === "string" && rec.output_text.trim() !== "") {
+    return rec.output_text;
+  }
+  // 2. OpenAI Chat: choices[0].message.content
   const choices = rec?.choices as Array<Record<string, unknown>> | undefined;
   const message = choices?.[0]?.message as Record<string, unknown> | undefined;
   if (typeof message?.content === "string") return message.content;
-  // Anthropic: content[].text
+  // 3. OpenAI Responses API nested output: output[].content[].text
+  const output = rec?.output as Array<Record<string, unknown>> | undefined;
+  if (Array.isArray(output)) {
+    const textParts: string[] = [];
+    for (const item of output) {
+      const itemContent = item?.content as Array<Record<string, unknown>> | undefined;
+      if (Array.isArray(itemContent)) {
+        for (const c of itemContent) {
+          if (c?.type === "text" && typeof c?.text === "string") {
+            textParts.push(c.text);
+          }
+        }
+      }
+    }
+    if (textParts.length > 0) return textParts.join("");
+  }
+  // 4. Anthropic: content[].text
   const content = rec?.content as Array<Record<string, unknown>> | undefined;
   if (Array.isArray(content)) {
-    return content
+    const text = content
       .filter((part) => part?.type === "text" && typeof part.text === "string")
       .map((part) => part.text)
       .join("");
+    if (text) return text;
   }
+  // 5. Common custom wrapper / proxy fields: response, result, text
+  if (typeof rec?.response === "string") return rec.response;
+  if (typeof rec?.result === "string") return rec.result;
+  if (typeof rec?.text === "string") return rec.text;
+
   throw new LlmError("Unrecognized LLM response shape");
 }
 

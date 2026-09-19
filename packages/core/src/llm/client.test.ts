@@ -38,6 +38,42 @@ describe("chatComplete", () => {
     expect(text).toBe("hello");
   });
 
+  it("reads OpenAI Responses API output_text replies", async () => {
+    const text = await chatComplete(
+      { protocol: "response", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      { fetchImpl: fetchJson({ output_text: "response output" }) }
+    );
+    expect(text).toBe("response output");
+  });
+
+  it("reads OpenAI Responses API output structure replies", async () => {
+    const text = await chatComplete(
+      { protocol: "response", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      {
+        fetchImpl: fetchJson({
+          output: [
+            {
+              type: "message",
+              content: [{ type: "text", text: "nested response output" }],
+            },
+          ],
+        }),
+      }
+    );
+    expect(text).toBe("nested response output");
+  });
+
+  it("reads custom proxy response fields", async () => {
+    const text = await chatComplete(
+      { protocol: "openai", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [{ role: "user", content: "hi" }],
+      { fetchImpl: fetchJson({ response: "proxy response" }) }
+    );
+    expect(text).toBe("proxy response");
+  });
+
   it("reads Anthropic-shaped replies", async () => {
     const text = await chatComplete(
       { protocol: "anthropic", baseUrl: "https://x/v1", apiKey: "k", model: "m" },

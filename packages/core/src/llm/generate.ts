@@ -5,7 +5,6 @@ import type { LlmApiSettings } from "../store/settingsStore";
 import { chatComplete, extractJsonBlock, LlmError } from "./client";
 import type { LlmClientConfig } from "./client";
 import { buildClarifyMessages, buildDraftMessages, buildRepairUserMessage } from "./prompts";
-import { TEMPLATES } from "../templates";
 
 export interface ClarifyQuestion {
   question: string;
@@ -63,9 +62,10 @@ export async function generateClarify(
   ctx: GenerateContext,
   input: { description: string; locale: "zh-CN" | "zh-TW" | "en" | "ja"; includeCurrent: boolean; currentProjectJson?: string }
 ): Promise<ClarifyQuestion[]> {
-  if (ctx.settings.mockMode) return mockClarify(input.locale);
-
   const cfg = clientConfig(ctx.settings);
+  if (!cfg.apiKey && !ctx.settings.useProxy) {
+    throw new LlmError("LLM API Key 未配置，请在设置中填写 API Key 或开启本地代理。");
+  }
   const messages = buildClarifyMessages(input);
   let reply = await chatComplete(cfg, messages, { fetchImpl: ctx.fetchImpl, signal: ctx.signal });
   let parsed = safeParseClarify(reply);
@@ -101,9 +101,10 @@ export async function generateDraft(
     currentProjectJson?: string;
   }
 ): Promise<JevProject> {
-  if (ctx.settings.mockMode) return mockDraft(input.locale);
-
   const cfg = clientConfig(ctx.settings);
+  if (!cfg.apiKey && !ctx.settings.useProxy) {
+    throw new LlmError("LLM API Key 未配置，请在设置中填写 API Key 或开启本地代理。");
+  }
   const messages = buildDraftMessages(input);
   let reply = await chatComplete(cfg, messages, { fetchImpl: ctx.fetchImpl, signal: ctx.signal, temperature: 0.4 });
   let parsed = safeParseDraft(reply);
@@ -156,75 +157,4 @@ function draftToProject(draft: z.infer<typeof draftSchema>): JevProject {
     state: draft.state as JevProject["state"],
     questions,
   };
-}
-
-// --- mock path (LLM demo mode, mirrors the zh/en doc example) ---------------
-
-function mockClarify(locale: "zh-CN" | "zh-TW" | "en" | "ja"): ClarifyQuestion[] {
-  if (locale === "zh-CN") {
-    return [
-      {
-        question: "评估的对象通常是什么内容?",
-        options: [
-          { label: "客服工单/用户消息", description: "工单、邮件、聊天消息等" },
-          { label: "结构化记录", description: "订单、发票、简历等字段化数据" },
-          { label: "混合内容", description: "消息+相关记录一起评估" },
-        ],
-        multiSelect: false,
-      },
-      {
-        question: "需要哪些判断维度?(可多选)",
-        options: [
-          { label: "分类/路由", description: "把内容分到固定类别" },
-          { label: "程度评分", description: "如紧急度、愤怒度、严重度" },
-          { label: "是非判断", description: "如是否要求退款、是否紧急" },
-        ],
-        multiSelect: true,
-      },
-      {
-        question: "分类的类别大概有哪些?",
-        options: [
-          { label: "账单/技术/销售", description: "常见客服三分法" },
-          { label: "退货/物流/账单", description: "电商场景三分法" },
-          { label: "我自己提供", description: "生成后我在编辑器里改" },
-        ],
-        multiSelect: false,
-      },
-    ];
-  }
-  return [
-    {
-      question: "What content will be evaluated?",
-      options: [
-        { label: "Tickets / user messages", description: "Support tickets, emails, chat messages" },
-        { label: "Structured records", description: "Orders, invoices, resumes" },
-        { label: "Mixed content", description: "Message plus related records" },
-      ],
-      multiSelect: false,
-    },
-    {
-      question: "Which judgment dimensions do you need? (multi-select)",
-      options: [
-        { label: "Classification / routing", description: "Assign content to fixed categories" },
-        { label: "Degree scoring", description: "Urgency, frustration, severity…" },
-        { label: "Yes/no judgments", description: "Refund requested? Urgent?" },
-      ],
-      multiSelect: true,
-    },
-    {
-      question: "Roughly which categories?",
-      options: [
-        { label: "Billing / technical / sales", description: "Common support triage" },
-        { label: "Returns / shipping / billing", description: "E-commerce triage" },
-        { label: "I'll provide my own", description: "I'll edit them in the builder" },
-      ],
-      multiSelect: false,
-    },
-  ];
-}
-
-function mockDraft(locale: "zh-CN" | "zh-TW" | "en" | "ja"): JevProject {
-  const t = TEMPLATES[0]!.build(locale);
-  t.name = locale === "zh-CN" || locale === "zh-TW" ? "AI 草稿" : "AI draft";
-  return t;
 }

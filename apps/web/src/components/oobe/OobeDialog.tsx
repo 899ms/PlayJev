@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Globe } from "lucide-react";
-import { LOCALES, LOCALE_LABELS, PROVIDER_PRESETS, type Locale } from "@playjev/core";
+import { LOCALES, LOCALE_LABELS, PROVIDER_PRESETS, type Locale, type LlmProtocol } from "@playjev/core";
 import { useSettings, useT } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/field";
@@ -111,9 +111,6 @@ export function OobeDialog() {
                 onChange={(e) => settings.setJev({ apiKey: e.target.value })}
               />
             </div>
-            <div className="rounded-lg bg-zinc-50 px-3 py-2 text-xs leading-relaxed text-zinc-500">
-              {t("response.mockOn")}
-            </div>
           </div>
         )}
 
@@ -141,6 +138,31 @@ export function OobeDialog() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label>{t("settings.protocol")}</Label>
+              <Select
+                value={settings.llm.protocol}
+                onValueChange={(v) => settings.setLlm({ protocol: v as LlmProtocol })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="openai">{t("settings.protocol.openai")}</SelectItem>
+                  <SelectItem value="response">{t("settings.protocol.response")}</SelectItem>
+                  <SelectItem value="anthropic">{t("settings.protocol.anthropic")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label>{t("settings.model")}</Label>
+              <Input
+                className="font-mono text-xs"
+                placeholder="gpt-4o-mini / deepseek-chat / ..."
+                value={settings.llm.model}
+                onChange={(e) => settings.setLlm({ model: e.target.value })}
+              />
             </div>
             <div className="flex flex-col gap-1">
               <Label>{t("settings.baseUrl")}</Label>

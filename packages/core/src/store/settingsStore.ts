@@ -14,7 +14,7 @@ export interface JevApiSettings {
   mockMode: boolean;
 }
 
-export type LlmProtocol = "openai" | "anthropic";
+export type LlmProtocol = "openai" | "response" | "anthropic";
 
 export interface LlmApiSettings {
   protocol: LlmProtocol;
@@ -56,7 +56,7 @@ export const DEFAULT_JEV_SETTINGS: JevApiSettings = {
   model: "jev-latest",
   useProxy: false,
   proxyOrigin: DEFAULT_PROXY_ORIGIN,
-  mockMode: true,
+  mockMode: false,
 };
 
 export const DEFAULT_LLM_SETTINGS: LlmApiSettings = {

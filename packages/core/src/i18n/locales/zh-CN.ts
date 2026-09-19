@@ -188,6 +188,7 @@ export const zhCN: Dictionary = {
   "settings.mockMode": "演示模式(不真实调用)",
   "settings.protocol": "协议",
   "settings.protocol.openai": "OpenAI 兼容",
+  "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",
   "settings.model": "模型",
@@ -206,8 +207,11 @@ export const zhCN: Dictionary = {
   "ai.step2Hint": "AI 需要这些信息来生成更准确的草稿。",
   "ai.single": "单选",
   "ai.multi": "多选",
+  "ai.manualInput": "手动输入",
+  "ai.customInputPlaceholder": "输入自定义回答或补充说明…",
   "ai.step3Title": "生成结果",
   "ai.step3Hint": "检查草稿,应用后可继续在编辑器中微调。",
+  "ai.copyAgentSchema": "复制 Schema 给 Agent",
   "ai.draftQuestions": "{count} 个问题",
   "ai.choiceOptions": "{count} 个选项",
   "ai.scoreLevels": "{count} 个等级",
@@ -239,6 +243,7 @@ export const zhCN: Dictionary = {
 
   // toasts
   "toast.copied": "已复制到剪贴板",
+  "toast.schemaCopied": "已复制 Agent 开发 Schema 到剪贴板",
   "toast.templateLoaded": "已载入模板",
   "toast.newProject": "已新建空白项目",
   "toast.aiApplied": "AI 草稿已应用到编辑器",

@@ -190,6 +190,7 @@ export const zhTW: Dictionary = {
   "settings.mockMode": "示範模式(不實際呼叫)",
   "settings.protocol": "協定",
   "settings.protocol.openai": "OpenAI 相容",
+  "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",
   "settings.model": "模型",
@@ -208,8 +209,11 @@ export const zhTW: Dictionary = {
   "ai.step2Hint": "AI 需要這些資訊來生成更準確的草稿。",
   "ai.single": "單選",
   "ai.multi": "多選",
+  "ai.manualInput": "手動輸入",
+  "ai.customInputPlaceholder": "輸入自訂回答或補充說明…",
   "ai.step3Title": "生成結果",
   "ai.step3Hint": "檢查草稿,套用後可繼續在編輯器中微調。",
+  "ai.copyAgentSchema": "複製 Schema 給 Agent",
   "ai.draftQuestions": "{count} 個問題",
   "ai.choiceOptions": "{count} 個選項",
   "ai.scoreLevels": "{count} 個等級",
@@ -241,6 +245,7 @@ export const zhTW: Dictionary = {
 
   // toasts
   "toast.copied": "已複製到剪貼簿",
+  "toast.schemaCopied": "已複製 Agent 開發 Schema 至剪貼簿",
   "toast.templateLoaded": "已載入範本",
   "toast.newProject": "已新建空白專案",
   "toast.aiApplied": "AI 草稿已套用到編輯器",

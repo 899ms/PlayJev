@@ -6,7 +6,6 @@ import {
   errorKeyForStatus,
   extractServerMessage,
   JevApiError,
-  mockEvaluate,
   serializeRequest,
   type JevResponse,
 } from "@playjev/core";
@@ -39,29 +38,30 @@ export function ResponsePane({ className }: { className?: string }) {
   const [phase, setPhase] = useState<SendPhase>({ status: "idle" });
 
   const sendRequest = async () => {
+    if (!jev.apiKey && !jev.useProxy) {
+      setPhase({
+        status: "error",
+        message: "Jev API Key 未配置，请先在右上角「设置」中填写 API Key 或开启本地代理。",
+      });
+      return;
+    }
     const request = { ...serializeRequest(project), model: jev.model };
     setPhase({ status: "loading" });
     const started = performance.now();
     try {
-      let response: JevResponse;
-      if (jev.mockMode) {
-        await sleep(450);
-        response = mockEvaluate(request);
-      } else {
-        const endpoint = jev.useProxy
-          ? `${jev.proxyOrigin.replace(/\/+$/, "")}/api/jev/systemone`
-          : jev.endpoint;
-        response = await evaluate(
-          { endpoint, apiKey: jev.apiKey },
-          request,
-          {
-            onRetry: (attempt, delayMs) =>
-              toast.message(t("response.sending"), {
-                description: t("response.retrying", { attempt, ms: Math.round(delayMs) }),
-              }),
-          }
-        );
-      }
+      const endpoint = jev.useProxy
+        ? `${jev.proxyOrigin.replace(/\/+$/, "")}/api/jev/systemone`
+        : jev.endpoint;
+      const response = await evaluate(
+        { endpoint, apiKey: jev.apiKey },
+        request,
+        {
+          onRetry: (attempt, delayMs) =>
+            toast.message(t("response.sending"), {
+              description: t("response.retrying", { attempt, ms: Math.round(delayMs) }),
+            }),
+        }
+      );
       const elapsedMs = Math.round(performance.now() - started);
       projectStore.getState().setLastRun({ request, response, elapsedMs });
       setPhase({ status: "idle" });
@@ -91,7 +91,6 @@ export function ResponsePane({ className }: { className?: string }) {
           </span>
         )}
         <div className="ml-auto flex items-center gap-1.5">
-          {jev.mockMode && <Badge tone="amber">{t("response.mockBadge")}</Badge>}
           <Button size="sm" onClick={sendRequest} disabled={phase.status === "loading"}>
             <Send size={13} /> {phase.status === "loading" ? t("response.sending") : t("response.send")}
           </Button>
@@ -116,7 +115,6 @@ export function ResponsePane({ className }: { className?: string }) {
         {phase.status === "idle" && !lastRun && (
           <div className="flex h-full flex-col items-center justify-center gap-1.5 text-center">
             <p className="text-sm text-zinc-400">{t("response.empty")}</p>
-            {jev.mockMode && <p className="text-xs text-amber-600">{t("response.mockOn")}</p>}
           </div>
         )}
         {phase.status === "idle" && lastRun && tab === "json" && (
