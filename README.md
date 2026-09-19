@@ -83,19 +83,6 @@ docs/jev/         TypeSafe official docs mirror (Markdown, Sep 2026)
 
 Mobile (Expo) and desktop (Tauri) shells reuse `@playjev/core` — tracked as P2 in [DESIGN.md](./DESIGN.md).
 
-## 🤝 Contributing
-
-Issues and PRs are welcome. Quick orientation for contributors:
-
-```bash
-npm run typecheck    # tsc over core + web
-npx vitest run       # 75 unit tests
-```
-
-- `packages/core` must stay DOM-free (pure logic + `platform/` seams).
-- UI copy lives in `packages/core/src/i18n/locales/` — one file per language, same keys everywhere.
-- Network calls always go through same-origin `/api/*`; never call providers directly from the browser.
-
 ## 🙏 Acknowledgements
 
 - [TypeSafe AI](https://typesafe.ai) — the Jev model and its excellent docs
