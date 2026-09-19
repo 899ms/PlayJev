@@ -50,7 +50,7 @@ export function ResponsePane({ className }: { className?: string }) {
     const started = performance.now();
     try {
       const endpoint = jev.useProxy
-        ? `${jev.proxyOrigin.replace(/\/+$/, "")}/api/jev/systemone`
+        ? (jev.proxyOrigin?.trim() ? `${jev.proxyOrigin.replace(/\/+$/, "")}/api/jev/systemone` : "/api/jev/systemone")
         : jev.endpoint;
       const response = await evaluate(
         { endpoint, apiKey: jev.apiKey },

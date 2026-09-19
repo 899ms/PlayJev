@@ -8,6 +8,7 @@
     "apps/*"
   ],
   "scripts": {
+    "start": "node server/proxy.mjs",
     "dev": "npm run dev -w @playjev/web",
     "build": "npm run build -w @playjev/web",
     "typecheck": "tsc -p packages/core && tsc -p apps/web",

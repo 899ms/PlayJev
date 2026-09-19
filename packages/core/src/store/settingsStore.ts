@@ -45,7 +45,7 @@ export interface SettingsState {
 }
 
 export const DEFAULT_JEV_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
-export const DEFAULT_PROXY_ORIGIN = "http://localhost:8787";
+export const DEFAULT_PROXY_ORIGIN = "";
 /** docs/jev/confidence.md example thresholds. */
 export const DEFAULT_CONFIDENCE_HIGH = 0.9;
 export const DEFAULT_CONFIDENCE_LOW = 0.5;
@@ -54,7 +54,7 @@ export const DEFAULT_JEV_SETTINGS: JevApiSettings = {
   apiKey: "",
   endpoint: DEFAULT_JEV_ENDPOINT,
   model: "jev-latest",
-  useProxy: false,
+  useProxy: true,
   proxyOrigin: DEFAULT_PROXY_ORIGIN,
   mockMode: false,
 };

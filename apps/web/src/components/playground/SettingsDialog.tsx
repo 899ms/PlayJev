@@ -287,7 +287,8 @@ function ProxyRows({
         <Switch checked={useProxy} onCheckedChange={onUseProxy} />
         {useProxy && (
           <Input
-            className="h-7 w-56 font-mono text-xs"
+            className="h-7 w-64 font-mono text-xs"
+            placeholder={t("settings.proxyPlaceholder")}
             value={proxyOrigin}
             onChange={(e) => onProxyOrigin(e.target.value)}
           />

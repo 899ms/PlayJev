@@ -53,7 +53,8 @@ export interface GenerateContext {
 
 function clientConfig(settings: LlmApiSettings): LlmClientConfig {
   if (settings.useProxy) {
-    return { ...settings, baseUrl: `${settings.proxyOrigin.replace(/\/+$/, "")}/api/llm` };
+    const origin = settings.proxyOrigin?.trim() ? settings.proxyOrigin.replace(/\/+$/, "") : "";
+    return { ...settings, baseUrl: `${origin}/api/llm` };
   }
   return settings;
 }
