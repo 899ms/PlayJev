@@ -45,6 +45,27 @@ describe("chatComplete", () => {
     expect(text).toBe("response output");
   });
 
+  it("sends Responses API shape: instructions + input, no temperature", async () => {
+    let gotBody = "";
+    const cap = (async (input: any, init: any) => {
+      gotBody = init.body as string;
+      return new Response(JSON.stringify({ output_text: "ok" }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }) as unknown as typeof fetch;
+    await chatComplete(
+      { protocol: "response", baseUrl: "https://x/v1", apiKey: "k", model: "m" },
+      [
+        { role: "system", content: "sys" },
+        { role: "user", content: "hi" },
+      ],
+      { fetchImpl: cap, temperature: 0.4 }
+    );
+    const body = JSON.parse(gotBody) as Record<string, unknown>;
+    expect(body["instructions"]).toBe("sys");
+    expect(body["input"]).toEqual([{ role: "user", content: "hi" }]);
+    expect("temperature" in body).toBe(false);
+    expect(body["max_output_tokens"]).toBe(4096);
+  });
+
   it("reads OpenAI Responses API output structure replies", async () => {
     const text = await chatComplete(
       { protocol: "response", baseUrl: "https://x/v1", apiKey: "k", model: "m" },

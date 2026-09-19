@@ -55,6 +55,16 @@ export async function chatComplete(cfg: LlmClientConfig, messages: LlmMessage[],
     });
   } else if (cfg.protocol === "response") {
     const url = base.endsWith("/responses") ? base : `${base}/responses`;
+    // Responses API shape: system prompt goes to top-level `instructions`,
+    // conversation goes to `input` (no `system` role there), and sampling
+    // params are omitted (reasoning models reject `temperature`).
+    const instructions = messages
+      .filter((m) => m.role === "system")
+      .map((m) => m.content)
+      .join("\n\n");
+    const input = messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({ role: m.role, content: m.content }));
     res = await doFetch(url, {
       method: "POST",
       headers: {
@@ -63,8 +73,8 @@ export async function chatComplete(cfg: LlmClientConfig, messages: LlmMessage[],
       },
       body: JSON.stringify({
         model: cfg.model,
-        input: messages.map((m) => ({ role: m.role, content: m.content })),
-        temperature: opts?.temperature ?? 0.7,
+        ...(instructions ? { instructions } : {}),
+        input,
         max_output_tokens: opts?.maxTokens ?? 4096,
       }),
       signal: opts?.signal,
