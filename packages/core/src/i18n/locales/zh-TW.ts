@@ -183,7 +183,7 @@ export const zhTW: Dictionary = {
   "settings.apiKey": "API Key",
   "settings.apiKeyRisk": "Key 以明文儲存在瀏覽器 localStorage,僅限本機使用,請勿在共用裝置上保存。",
   "settings.protocol": "協定",
-  "settings.protocol.openai": "OpenAI 相容",
+  "settings.protocol.openai": "OpenAI Chat",
   "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",

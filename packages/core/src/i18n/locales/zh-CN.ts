@@ -181,7 +181,7 @@ export const zhCN: Dictionary = {
   "settings.apiKey": "API Key",
   "settings.apiKeyRisk": "Key 以明文保存在浏览器 localStorage,仅本机使用,请勿在共享设备上保存。",
   "settings.protocol": "协议",
-  "settings.protocol.openai": "OpenAI 兼容",
+  "settings.protocol.openai": "OpenAI Chat",
   "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",

@@ -183,7 +183,7 @@ export const en: Dictionary = {
   "settings.apiKey": "API Key",
   "settings.apiKeyRisk": "The key is stored in plain text in this browser's localStorage. For local use only — don't save it on shared machines.",
   "settings.protocol": "Protocol",
-  "settings.protocol.openai": "OpenAI-compatible",
+  "settings.protocol.openai": "OpenAI Chat",
   "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",

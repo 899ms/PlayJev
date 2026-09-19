@@ -66,7 +66,6 @@ export function OobeDialog() {
                   type="button"
                   onClick={() => {
                     settings.setLocale(loc);
-                    setStep(2);
                   }}
                   className={cn(
                     "rounded-lg border p-4 text-center text-base font-medium transition-colors",
@@ -204,7 +203,7 @@ export function OobeDialog() {
           )}
           {step < 3 ? (
             <Button size="sm" onClick={() => setStep((s) => (s + 1) as OobeStep)}>
-              {step === 2 ? t("oobe.skipLater") : t("common.next")} <ArrowRight size={14} />
+              {step === 1 || settings.jev.apiKey.trim() !== "" ? t("common.next") : t("oobe.skipLater")} <ArrowRight size={14} />
             </Button>
           ) : (
             <Button size="sm" onClick={finish}>

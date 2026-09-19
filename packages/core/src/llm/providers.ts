@@ -8,9 +8,9 @@ export interface ProviderPreset {
   defaultModel: string;
 }
 
-/** OpenAI-compatible covers GLM / DeepSeek / Kimi / Qwen / OpenAI / OpenRouter / Ollama. */
+/** OpenAI Chat covers GLM / DeepSeek / Kimi / Qwen / OpenAI / OpenRouter / Ollama. */
 export const PROVIDER_PRESETS: ProviderPreset[] = [
-  { id: "custom-openai", label: "自定义 (OpenAI 兼容)", protocol: "openai", baseUrl: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
+  { id: "custom-openai", label: "自定义 (OpenAI Chat)", protocol: "openai", baseUrl: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
   { id: "custom-response", label: "自定义 (OpenAI Responses)", protocol: "response", baseUrl: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
   { id: "openai", label: "OpenAI", protocol: "openai", baseUrl: "https://api.openai.com/v1", defaultModel: "gpt-4o-mini" },
   { id: "glm", label: "智谱 GLM", protocol: "openai", baseUrl: "https://open.bigmodel.cn/api/paas/v4", defaultModel: "glm-4.6" },

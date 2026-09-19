@@ -183,7 +183,7 @@ export const ja: Dictionary = {
   "settings.apiKey": "API キー",
   "settings.apiKeyRisk": "キーはこのブラウザの localStorage に平文で保存されます。ローカル利用に限り、共有 PC では保存しないでください。",
   "settings.protocol": "プロトコル",
-  "settings.protocol.openai": "OpenAI 互換",
+  "settings.protocol.openai": "OpenAI Chat",
   "settings.protocol.response": "OpenAI Responses",
   "settings.protocol.anthropic": "Anthropic",
   "settings.baseUrl": "Base URL",
