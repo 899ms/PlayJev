@@ -1,50 +1,102 @@
+<div align="center">
+
 # PlayJev
 
-可视化构建 [Jev](https://docs.typesafe.ai/introduction)（TypeSafe System One 模型）的 API 输入：
-编排 `state` + 类型化问题（Choice / Score / Noul），实时预览请求 JSON、前置校验、
-发送并**以可视化卡片查看响应**，还能用任意 LLM 从一段描述生成草稿。
+**Visual IDE for [Jev](https://docs.typesafe.ai/introduction) (TypeSafe System One) API inputs**
 
-> 设计文档：[DESIGN.md](./DESIGN.md) · 文档镜像：[docs/jev/](./docs/jev/README.md)
+Compose `state` + typed questions (Choice / Score / Noul), preview the request JSON,
+validate, send — and read the answers as **visual cards**, not raw JSON.
+Any LLM can draft the whole request from one sentence.
 
-## 预览
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Node 18+](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
+[![Docker Ready](https://img.shields.io/badge/docker-ready-blue.svg)](docker-compose.yml)
+[![Cloudflare Workers](https://img.shields.io/badge/cloudflare-workers%20%7C%20pages-orange.svg)](wrangler.toml)
+[![i18n](https://img.shields.io/badge/i18n-6%20locales-purple.svg)](#-features)
 
-| 桌面端 | 移动端 |
+[Getting Started](#-quick-start) · [Deployment](#-deployment) · [Design](./DESIGN.md) · [Docs mirror](./docs/jev/README.md)
+
+</div>
+
+---
+
+## ✨ Preview
+
+| Desktop | Mobile |
 | --- | --- |
-| ![桌面端总览](docs/images/screenshot-desktop.png) | ![移动端构建页](docs/images/screenshot-mobile-build.png) |
-| ![首启引导向导](docs/images/screenshot-oobe.png) | ![移动端结果卡片](docs/images/screenshot-mobile-result.png) |
+| ![Desktop overview](docs/images/screenshot-desktop.png) | ![Mobile build page](docs/images/screenshot-mobile-build.png) |
+| ![First-run wizard](docs/images/screenshot-oobe.png) | ![Mobile result cards](docs/images/screenshot-mobile-result.png) |
 
-## 功能
+## 🚀 Features
 
-- **双栏 IDE**：左栏构建请求（状态：纯文本 / 可视化树 / JSON；问题：构建器 ⇄ JSON），右栏看结果（可视化卡片 ⇄ JSON）
-- **Playground**：填入 Jev API Key 即可发送，请求固定走同源内置反代（自动绕过浏览器 CORS），429/529 自动退避重试
-- **AI 生成向导**：一段描述 → 澄清选择题（含手动输入）→ 生成完整草稿 → 应用到编辑器 / 一键复制 Schema 给 Agent
-- **多语言**：简体中文 / 繁體中文 / English / 日本語 / Deutsch / Français
-- **开箱即用**：预设模板、撤回恢复、静默持久化、导入导出、首启引导，桌面与移动端自适应布局
+| Area | What you get |
+| --- | --- |
+| 🖥️ Dual-pane IDE | Build request (state: text / visual tree / JSON; questions: builder ⇄ JSON) on the left, read results (visual cards ⇄ JSON) on the right |
+| 🧪 Playground | Paste a Jev API key and hit Send — traffic goes through a built-in same-origin proxy (no CORS pain), with automatic 429/529 backoff |
+| 🤖 AI wizard | One sentence → clarifying questions (with free-text input) → full draft → apply to editor or copy the Schema straight to your coding Agent |
+| 🌍 i18n | 简体中文 / 繁體中文 / English / 日本語 / Deutsch / Français |
+| 📦 Ready to use | Preset templates, undo/redo, silent persistence, import/export, first-run wizard, responsive desktop + mobile layouts |
 
-## 快速开始
+## ⚡ Quick start
 
 ```bash
-npm install          # 首次安装
-npm run dev          # 本地开发 → http://localhost:5173
-npm start            # 单进程服务 → http://localhost:8787
-npm test             # 单测
-npm run build        # 生产构建 → apps/web/dist
+npm install          # first-time setup
+npm run dev          # local dev → http://localhost:5173
+npm start            # single-process server → http://localhost:8787
+npm test             # unit tests
+npm run build        # production build → apps/web/dist
 ```
 
-发送真实请求：设置 → Jev API 填入 API key（[console.typesafe.ai](https://console.typesafe.ai/keys) 获取），保存后直接点发送即可。
+Get a key at [console.typesafe.ai](https://console.typesafe.ai/keys), paste it under
+Settings → Jev API, and press Send. That's it — the reverse proxy needs no configuration.
 
-## 部署
+## 🐳 Deployment
 
 ```bash
 docker compose up -d --build
-# 打开 http://localhost:10010（端口可用 PLAYJEV_PORT 覆盖）
+# open http://localhost:10010 (override with PLAYJEV_PORT)
 ```
 
-所有网络请求固定走同源反代（`/api/jev/systemone`、`/api/llm`），无需手动配置。
-Cloudflare 部署同样零配置：Workers 用 `npx wrangler deploy`，Pages 构建输出 `apps/web/dist` 即可（`functions/api/*` 自动成为反代）。
-纯静态托管（Vercel / GitHub Pages）无反代，发送功能不可用，详见 [DESIGN.md](./DESIGN.md)。
+| Target | How | Reverse proxy |
+| --- | --- | --- |
+| Docker Compose | `docker compose up -d --build` | ✅ nginx → proxy service, zero config |
+| Cloudflare Workers | `npx wrangler deploy` | ✅ `server/worker.ts` (static + `/api/*`) |
+| Cloudflare Pages | build `npm run build`, output `apps/web/dist` | ✅ `functions/api/*` auto-attached |
+| Node single-process | `npm run build && npm start` | ✅ built into `server/proxy.mjs` |
+| Static-only hosts | dist works, **Send does not** (TypeSafe blocks browser CORS) | ❌ use one of the above instead |
 
-## 致谢
+All API traffic is pinned to same-origin `/api/jev/systemone` and `/api/llm` —
+direct browser calls and custom proxy settings were removed on purpose.
+See [DESIGN.md](./DESIGN.md) for the architecture.
 
-- [TypeSafe AI](https://typesafe.ai) —— Jev 模型与官方文档
-- [LinuxDo](https://linux.do) 社区 —— 项目灵感与早期反馈
+## 🗺️ Project layout
+
+```
+packages/core/    @playjev/core — platform-agnostic logic (types, zod, lint,
+                  token estimate, state-tree ops, templates, i18n, LLM/Jev clients)
+apps/web/         @playjev/web — Vite + React + Tailwind web IDE (dev proxy plugin included)
+server/proxy.mjs  single-process server: serves apps/web/dist + /api/* proxy
+server/worker.ts  Cloudflare Workers edge proxy (static assets + /api/*)
+functions/api/    Cloudflare Pages proxy (jev/systemone.ts + llm.ts)
+docs/jev/         TypeSafe official docs mirror (Markdown, Sep 2026)
+```
+
+Mobile (Expo) and desktop (Tauri) shells reuse `@playjev/core` — tracked as P2 in [DESIGN.md](./DESIGN.md).
+
+## 🤝 Contributing
+
+Issues and PRs are welcome. Quick orientation for contributors:
+
+```bash
+npm run typecheck    # tsc over core + web
+npx vitest run       # 75 unit tests
+```
+
+- `packages/core` must stay DOM-free (pure logic + `platform/` seams).
+- UI copy lives in `packages/core/src/i18n/locales/` — one file per language, same keys everywhere.
+- Network calls always go through same-origin `/api/*`; never call providers directly from the browser.
+
+## 🙏 Acknowledgements
+
+- [TypeSafe AI](https://typesafe.ai) — the Jev model and its excellent docs
+- [LinuxDo](https://linux.do) community — inspiration and early feedback
