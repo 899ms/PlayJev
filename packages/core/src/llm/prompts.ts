@@ -24,7 +24,11 @@ export function buildClarifyMessages(input: ClarifyInput): LlmMessage[] {
         ? "Traditional Chinese (繁體中文)"
         : input.locale === "ja"
           ? "Japanese (日本語)"
-          : "English";
+          : input.locale === "de"
+            ? "German (Deutsch)"
+            : input.locale === "fr"
+              ? "French (Français)"
+              : "English";
   const system = `You help a developer design inputs for the TypeSafe "Jev" System One API.
 The user will describe what they want to evaluate. Before producing anything, ask 2 to 4 short
 multiple-choice clarifying questions that materially change the design of the questions
@@ -79,7 +83,11 @@ export function buildDraftMessages(input: DraftInput): LlmMessage[] {
         ? "Traditional Chinese (繁體中文)"
         : input.locale === "ja"
           ? "Japanese (日本語)"
-          : "English";
+          : input.locale === "de"
+            ? "German (Deutsch)"
+            : input.locale === "fr"
+              ? "French (Français)"
+              : "English";
   const system = `You design Jev (TypeSafe System One) request bodies and return them as JSON.
 ${BEST_PRACTICES}
 All human-readable text (state, instructions, criteria, name) MUST be written in ${languageName}.

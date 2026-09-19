@@ -3,9 +3,9 @@
  * this with a hook; other platforms call translate() directly.
  */
 
-export type Locale = "zh-CN" | "zh-TW" | "en" | "ja";
+export type Locale = "zh-CN" | "zh-TW" | "en" | "ja" | "de" | "fr";
 
-export const LOCALES: Locale[] = ["zh-CN", "zh-TW", "en", "ja"];
+export const LOCALES: Locale[] = ["zh-CN", "zh-TW", "en", "ja", "de", "fr"];
 export const DEFAULT_LOCALE: Locale = "zh-CN";
 
 /** Native names for the language switcher. */
@@ -14,6 +14,8 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   "zh-TW": "繁體中文",
   en: "English",
   ja: "日本語",
+  de: "Deutsch",
+  fr: "Français",
 };
 
 export type Dictionary = Record<string, string>;

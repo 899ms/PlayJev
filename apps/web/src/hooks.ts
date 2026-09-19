@@ -8,6 +8,8 @@ import {
   zhCN,
   zhTW,
   ja,
+  de,
+  fr,
   type Locale,
   type ProjectStore,
   type SettingsState,
@@ -26,7 +28,7 @@ export function useSettings<T>(selector: (s: SettingsState) => T): T {
   return useStore(settingsStore, selector);
 }
 
-const DICTS: Record<Locale, Record<string, string>> = { "zh-CN": zhCN, "zh-TW": zhTW, en, ja };
+const DICTS: Record<Locale, Record<string, string>> = { "zh-CN": zhCN, "zh-TW": zhTW, en, ja, de, fr };
 
 /** Translation hook bound to the current locale. Missing keys render as the key itself. */
 export function useT() {

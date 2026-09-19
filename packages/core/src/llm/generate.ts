@@ -62,7 +62,7 @@ function clientConfig(settings: LlmApiSettings): LlmClientConfig {
 
 export async function generateClarify(
   ctx: GenerateContext,
-  input: { description: string; locale: "zh-CN" | "zh-TW" | "en" | "ja"; includeCurrent: boolean; currentProjectJson?: string }
+  input: { description: string; locale: "zh-CN" | "zh-TW" | "en" | "ja" | "de" | "fr"; includeCurrent: boolean; currentProjectJson?: string }
 ): Promise<ClarifyQuestion[]> {
   const cfg = clientConfig(ctx.settings);
   if (!cfg.apiKey) {
@@ -98,7 +98,7 @@ export async function generateDraft(
   input: {
     description: string;
     answers: { question: string; selected: string[] }[];
-    locale: "zh-CN" | "zh-TW" | "en" | "ja";
+    locale: "zh-CN" | "zh-TW" | "en" | "ja" | "de" | "fr";
     includeCurrent: boolean;
     currentProjectJson?: string;
   }

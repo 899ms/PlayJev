@@ -78,9 +78,6 @@ export function OobeDialog() {
                 </button>
               ))}
             </div>
-            <p className="text-center text-xs text-zinc-400">
-              简体中文 · 繁體中文 · English · 日本語
-            </p>
           </div>
         )}
 

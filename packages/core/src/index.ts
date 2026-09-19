@@ -78,6 +78,8 @@ export { zhCN } from "./i18n/locales/zh-CN";
 export { en } from "./i18n/locales/en";
 export { zhTW } from "./i18n/locales/zh-TW";
 export { ja } from "./i18n/locales/ja";
+export { de } from "./i18n/locales/de";
+export { fr } from "./i18n/locales/fr";
 
 // jev client
 export { evaluate, defaultBackoffMs, errorKeyForStatus, extractServerMessage, JevApiError } from "./jev/client";
