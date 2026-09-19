@@ -12,7 +12,7 @@ import { projectStore, useSettings, useT } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Badge, Textarea } from "@/components/ui/field";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { copyText } from "@/lib/adapters";
+import { copyText, proxiedFetch } from "@/lib/adapters";
 import { cn } from "@/lib/utils";
 
 type Step = 1 | 2 | 3;
@@ -63,7 +63,7 @@ export function AIGenerateDialog({ open, onClose }: { open: boolean; onClose: ()
     try {
       const current = projectStore.getState().project;
       const clarify = await generateClarify(
-        { settings: llm },
+        { settings: llm, fetchImpl: proxiedFetch },
         {
           description: w.description,
           locale,
@@ -96,7 +96,7 @@ export function AIGenerateDialog({ open, onClose }: { open: boolean; onClose: ()
       });
 
       const draft = await generateDraft(
-        { settings: llm },
+        { settings: llm, fetchImpl: proxiedFetch },
         {
           description: w.description,
           answers,

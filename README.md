@@ -28,10 +28,11 @@
 - **响应式双布局**:桌面 = 侧栏 + 请求/结果双栏;**窄屏为两级页面**——项目列表页(点按模板或已保存项目进入)→ 详情页(左上角返回列表,底部标签栏在「构建 / 结果」间切换)
 - **前置 lint**(红/黄/蓝三级):结构错误、文档最佳实践(如 Score 纯数字等级、
   反引号路径不存在、缺 other 兜底项、状态字段名空/重复)、CJK 精度提示;CJK 感知 token 估算(32k/64k 双预算)
-- **Playground**:设置里配置 Jev API(key、**模型**、endpoint、本地代理),429/529 自动退避重试;
-  无 key 时可用演示模式(mock)
-- **AI 生成向导**:配置任意 LLM(OpenAI 兼容 / Anthropic,预设 GLM、DeepSeek、Kimi 等),
-  一段描述 → LLM 给澄清选择题 → 生成完整草稿 → 应用到编辑器
+- **Playground**:设置里配置 Jev API(key + **模型**),请求固定走同源内置反代
+  (`/api/jev/systemone`,自动绕过 TypeSafe 浏览器 CORS),429/529 自动退避重试
+- **AI 生成向导**:配置任意 LLM(OpenAI 兼容 / Responses / Anthropic,预设 GLM、DeepSeek、Kimi 等),
+  同样固定走同源内置反代(`/api/llm`);一段描述 → LLM 给澄清选择题(含手动输入)
+  → 生成完整草稿 → 应用到编辑器 / 一键复制 Schema 给 Agent
 - **多语言**:简体中文 / 繁體中文 / English / 日本語 可切换(文案集中在 `packages/core/src/i18n/locales/`,
   新增语言只需加一个字典文件;模板内容按语言出简体/繁體/英文版本)
 - 项目持久化(localStorage)、导入/导出 `.json`(在设置的「导入 / 导出」标签中;
@@ -45,39 +46,52 @@ docker compose up -d --build
 ```
 
 基于 Bun:构建阶段 `bun install && bun run build`,代理服务用 `bun server/proxy.mjs`。
-包含两个服务:`web`(nginx 托管静态构建)与 `proxy`(转发 Jev / LLM API,规避 CORS)。
-容器内已同源代理——首次引导里配好密钥即可;若手动配置,请在 设置 → Jev API / LLM API
-勾选「通过本地代理发送」并把代理地址**留空**(同源 `/api/*` 由 nginx 转发到 proxy 服务)。
+包含两个服务:`web`(nginx 托管静态构建)与 `proxy`(内置转发 Jev / LLM API)。
+所有网络请求固定走同源反代(`/api/jev/systemone`、`/api/llm`),不存在 CORS 问题,
+无需任何手动代理配置——首次引导里配好密钥即可直接发送。
 
-### 部署到静态托管
+### 部署到 Cloudflare(推荐,零配置反代)
 
-构建产物是纯静态 SPA,可直接部署到任意静态托管(Cloudflare Pages / Vercel / GitHub Pages 等):
-构建命令 `npm run build`,输出目录 `apps/web/dist`。演示模式无需任何后端;
-真实 API 调用需要处理 CORS(勾选应用内的代理走 `server/proxy.mjs`,或使用 Docker 部署)。
+仓库已内置边缘反代(`server/worker.ts` + `functions/api/`),Cloudflare 上开箱即用:
+
+- **Workers**:构建命令 `npm run build`,部署命令 `npx wrangler deploy`
+  (`wrangler.toml` 已配好静态资源 + 反代路由)。
+- **Pages**:构建命令 `npm run build`,输出目录 `apps/web/dist`,
+  `functions/api/*` 自动成为同源反代。
+
+### 部署到纯静态托管
+
+构建产物是纯静态 SPA(`npm run build` → `apps/web/dist`),可直接部署到
+Vercel / GitHub Pages 等。注意:纯静态托管没有同源反代,TypeSafe 官方 API 会拦截
+浏览器直连(CORS),此时 Jev 发送与 AI 生成不可用;如需完整功能请使用
+Cloudflare 或 Docker 部署。
 
 ## 快速开始(本地开发)
 
 ```bash
 npm install          # 首次安装
-npm run dev          # Web 应用 → http://localhost:5173
-npm run proxy        # 可选:本地代理(绕过浏览器 CORS)→ http://localhost:8787
+npm run dev          # Web 应用(内置同源反代)→ http://localhost:5173
+npm start            # 单进程:静态托管 + 内置反代 → http://localhost:8787
 npm test             # vitest 单测
 npm run build        # 生产构建
 ```
 
-- 发送真实请求:设置 → Jev API 填入 API key(或在 [console.typesafe.ai](https://console.typesafe.ai/keys) 获取);
-  浏览器 CORS 受限时打开「通过本地代理发送」并保持 `npm run proxy` 运行。
-- AI 生成:设置 → LLM API 选择预设(如智谱 GLM)并填 key;不开 key 可用演示模式体验完整流程。
+- 发送真实请求:设置 → Jev API 填入 API key(或在 [console.typesafe.ai](https://console.typesafe.ai/keys) 获取),
+  保存后直接点发送即可,反代全自动无需配置。
+- AI 生成:设置 → LLM API 选择预设(如智谱 GLM)并填 key;向导调用同样走同源反代。
 
 ## Monorepo 结构
 
 ```
 packages/core/    @playjev/core — 平台无关逻辑(类型/zod/serialize/lint/token 估算/
                   statetree/模板/i18n/LLM 客户端/Jev 客户端/store 工厂),零 DOM 依赖
-apps/web/         @playjev/web — Vite + React + Tailwind 全功能 Web 端(P0)
+apps/web/         @playjev/web — Vite + React + Tailwind 全功能 Web 端(P0,
+                  含 Vite 开发反代插件 + 同源 proxiedFetch 封装)
 apps/mobile/      Expo 移动端(P2,复用 core)
 apps/desktop/     Tauri 桌面壳(P2)
-server/proxy.mjs  零依赖本地代理:转发 /api/jev/* 与 /api/llm/*(按 x-llm-target)
+server/proxy.mjs  单进程服务:静态托管 apps/web/dist + 同源反代 /api/*(npm start 点开即用)
+server/worker.ts  Cloudflare Workers 边缘反代(静态资源 + 同源 /api/*)
+functions/api/    Cloudflare Pages 同源反代(jev/systemone.ts + llm.ts)
 docs/jev/         TypeSafe 官方文档 Markdown 镜像(2026-09 抓取)
 ```
 

@@ -5,25 +5,18 @@ import type { KeyValueStorage } from "../platform/types";
 
 export interface JevApiSettings {
   apiKey: string;
-  endpoint: string;
   /** Model sent with every request; selected in Settings (docs/jev/models.md). */
   model: string;
-  useProxy: boolean;
-  proxyOrigin: string;
-  /** Demo mode: return canned doc responses without calling the API. */
-  mockMode: boolean;
 }
 
 export type LlmProtocol = "openai" | "response" | "anthropic";
 
 export interface LlmApiSettings {
   protocol: LlmProtocol;
+  /** Real provider base URL. Never called directly — always via same-origin /api/llm. */
   baseUrl: string;
   apiKey: string;
   model: string;
-  useProxy: boolean;
-  proxyOrigin: string;
-  mockMode: boolean;
 }
 
 export interface SettingsState {
@@ -44,19 +37,19 @@ export interface SettingsState {
   setOobeCompleted(done: boolean): void;
 }
 
-export const DEFAULT_JEV_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
-export const DEFAULT_PROXY_ORIGIN = "";
+/** Same-origin reverse proxy mounted by every host (Vite dev plugin, npm start,
+ * nginx/docker, Cloudflare worker/functions). Bypasses TypeSafe browser CORS. */
+export const JEV_PROXY_PATH = "/api/jev/systemone";
+export const LLM_PROXY_PATH = "/api/llm";
+
+export const DEFAULT_JEV_UPSTREAM = "https://api.typesafe.ai/v1/systemone";
 /** docs/jev/confidence.md example thresholds. */
 export const DEFAULT_CONFIDENCE_HIGH = 0.9;
 export const DEFAULT_CONFIDENCE_LOW = 0.5;
 
 export const DEFAULT_JEV_SETTINGS: JevApiSettings = {
   apiKey: "",
-  endpoint: DEFAULT_JEV_ENDPOINT,
   model: "jev-latest",
-  useProxy: true,
-  proxyOrigin: DEFAULT_PROXY_ORIGIN,
-  mockMode: false,
 };
 
 export const DEFAULT_LLM_SETTINGS: LlmApiSettings = {
@@ -64,9 +57,6 @@ export const DEFAULT_LLM_SETTINGS: LlmApiSettings = {
   baseUrl: "https://api.openai.com/v1",
   apiKey: "",
   model: "gpt-4o-mini",
-  useProxy: false,
-  proxyOrigin: DEFAULT_PROXY_ORIGIN,
-  mockMode: false,
 };
 
 export function createSettingsStore(storage: KeyValueStorage) {
@@ -89,6 +79,32 @@ export function createSettingsStore(storage: KeyValueStorage) {
       {
         name: "playjev.settings.v1",
         storage: createJSONStorage(() => storage),
+        // v1 carried endpoint/useProxy/proxyOrigin/mockMode — drop them, keep key/model/baseUrl.
+        migrate: (restored: unknown) => {
+          const s = (restored ?? {}) as Record<string, unknown>;
+          const oldJev = (s.jev ?? {}) as Record<string, unknown>;
+          const oldLlm = (s.llm ?? {}) as Record<string, unknown>;
+          return {
+            locale: (s.locale as SettingsState["locale"]) ?? "zh-CN",
+            jev: {
+              apiKey: (oldJev.apiKey as string) ?? "",
+              model: (oldJev.model as string) ?? DEFAULT_JEV_SETTINGS.model,
+            },
+            llm: {
+              protocol: (oldLlm.protocol as LlmApiSettings["protocol"]) ?? DEFAULT_LLM_SETTINGS.protocol,
+              baseUrl: (oldLlm.baseUrl as string) ?? DEFAULT_LLM_SETTINGS.baseUrl,
+              apiKey: (oldLlm.apiKey as string) ?? "",
+              model: (oldLlm.model as string) ?? DEFAULT_LLM_SETTINGS.model,
+            },
+            confidence: (s.confidence as SettingsState["confidence"]) ?? {
+              high: DEFAULT_CONFIDENCE_HIGH,
+              low: DEFAULT_CONFIDENCE_LOW,
+            },
+            sidebarCollapsed: (s.sidebarCollapsed as boolean) ?? false,
+            oobeCompleted: (s.oobeCompleted as boolean) ?? false,
+          } as SettingsState;
+        },
+        version: 2,
       }
     )
   );

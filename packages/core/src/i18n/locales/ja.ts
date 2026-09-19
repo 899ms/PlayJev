@@ -144,8 +144,6 @@ export const ja: Dictionary = {
   "response.sending": "送信中…",
   "response.retrying": "自動リトライ {attempt} 回目、{ms} ms 後",
   "response.empty": "「送信」を押すと現在のリクエストを評価します。回答はカードで表示されます。",
-  "response.mockOn": "デモモード:API を呼ばずにドキュメントのサンプルレスポンスを返します。設定で解除できます。",
-  "response.mockBadge": "デモ",
   "response.errorTitle": "リクエスト失敗",
   "response.usage": "入力 {input} / 出力 {output} トークン",
   "response.elapsed": "{ms} ms",
@@ -171,7 +169,8 @@ export const ja: Dictionary = {
   "error.http429": "レート制限(429)。自動バックオフリトライでも失敗しました。後でもう一度お試しください。",
   "error.http529": "サーバーが過負荷です(529)。自動バックオフリトライでも失敗しました。後でお試しください。",
   "error.httpOther": "リクエスト失敗(HTTP {status}):{message}",
-  "error.network": "ネットワークエラー:エンドポイントに接続できません。ブラウザの CORS が原因の場合は、設定でローカルプロキシを有効にし npm run proxy を実行してください。",
+  "error.network": "ネットワークエラー:内蔵プロキシに接続できません。開発サーバー(npm run dev)、単一プロセスサーバー(npm start)、またはデプロイ環境が動作しているか確認してください。",
+  "error.missingKey": "Jev API Key が未設定です。右上の「設定 → Jev API」でキーを入力してから送信してください。",
 
   // settings
   "settings.title": "設定",
@@ -183,12 +182,6 @@ export const ja: Dictionary = {
   "settings.presetNone": "— 選択 —",
   "settings.apiKey": "API キー",
   "settings.apiKeyRisk": "キーはこのブラウザの localStorage に平文で保存されます。ローカル利用に限り、共有 PC では保存しないでください。",
-  "settings.endpoint": "エンドポイント",
-  "settings.useProxy": "リバースプロキシを有効化(CORS 回避)",
-  "settings.proxyOrigin": "プロキシのオリジン",
-  "settings.proxyPlaceholder": "空欄で同一オリジンの内蔵プロキシを使用",
-  "settings.proxyHint": "TypeSafe 公式 API はブラウザからの直接 CORS を制限しています。内蔵プロキシを搭載:Cloudflare、Vite 開発環境、Docker、npm start での実行時は空欄のままで動作します。",
-  "settings.mockMode": "デモモード(実 API 呼び出しなし)",
   "settings.protocol": "プロトコル",
   "settings.protocol.openai": "OpenAI 互換",
   "settings.protocol.response": "OpenAI Responses",
@@ -220,7 +213,6 @@ export const ja: Dictionary = {
   "ai.scoreLevels": "{count} 段階のレベル",
   "ai.apply": "エディタに適用",
   "ai.applyReplaceConfirm": "現在のプロジェクトには内容があります。適用すると置き換えられます。続行しますか?",
-  "ai.mockHint": "LLM デモモード:内蔵サンプルを返します。設定 → LLM API で実際のモデルを設定できます。",
   "ai.errorGenerate": "AI 生成に失敗しました:{message}",
 
   // templates

@@ -6,6 +6,7 @@ import {
   errorKeyForStatus,
   extractServerMessage,
   JevApiError,
+  JEV_PROXY_PATH,
   serializeRequest,
   type JevResponse,
 } from "@playjev/core";
@@ -22,8 +23,6 @@ type SendPhase = { status: "idle" } | { status: "loading" } | { status: "error";
 
 type ResultTab = "cards" | "json";
 
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
 /**
  * Right column: send the request and show the result either as visual answer
  * cards or as raw response JSON — never bare JSON by default. The last run is
@@ -38,10 +37,10 @@ export function ResponsePane({ className }: { className?: string }) {
   const [phase, setPhase] = useState<SendPhase>({ status: "idle" });
 
   const sendRequest = async () => {
-    if (!jev.apiKey && !jev.useProxy) {
+    if (!jev.apiKey) {
       setPhase({
         status: "error",
-        message: "Jev API Key 未配置，请先在右上角「设置」中填写 API Key 或开启本地代理。",
+        message: t("error.missingKey"),
       });
       return;
     }
@@ -49,11 +48,8 @@ export function ResponsePane({ className }: { className?: string }) {
     setPhase({ status: "loading" });
     const started = performance.now();
     try {
-      const endpoint = jev.useProxy
-        ? (jev.proxyOrigin?.trim() ? `${jev.proxyOrigin.replace(/\/+$/, "")}/api/jev/systemone` : "/api/jev/systemone")
-        : jev.endpoint;
       const response = await evaluate(
-        { endpoint, apiKey: jev.apiKey },
+        { endpoint: JEV_PROXY_PATH, apiKey: jev.apiKey },
         request,
         {
           onRetry: (attempt, delayMs) =>

@@ -144,8 +144,6 @@ export const en: Dictionary = {
   "response.sending": "Sending…",
   "response.retrying": "Automatic retry #{attempt} in {ms} ms",
   "response.empty": "Click “Send” to evaluate the current request. Answers appear as visual cards.",
-  "response.mockOn": "Demo mode: returns canned doc responses without calling the API. Turn it off in Settings.",
-  "response.mockBadge": "demo",
   "response.errorTitle": "Request failed",
   "response.usage": "{input} in / {output} out tokens",
   "response.elapsed": "{ms} ms",
@@ -171,7 +169,8 @@ export const en: Dictionary = {
   "error.http429": "Rate limited (429); automatic backoff retries did not help. Try again later.",
   "error.http529": "Server overloaded (529); automatic backoff retries did not help. Try again later.",
   "error.httpOther": "Request failed (HTTP {status}): {message}",
-  "error.network": "Network error: cannot reach the endpoint. If the browser blocks CORS, enable the local proxy in Settings and run npm run proxy.",
+  "error.network": "Network error: cannot reach the built-in proxy. Make sure the dev server (npm run dev), the single-process server (npm start), or your deployment is running.",
+  "error.missingKey": "Jev API Key is not set. Open Settings → Jev API (top-right) and fill in your key first.",
 
   // settings
   "settings.title": "Settings",
@@ -183,12 +182,6 @@ export const en: Dictionary = {
   "settings.presetNone": "— select —",
   "settings.apiKey": "API Key",
   "settings.apiKeyRisk": "The key is stored in plain text in this browser's localStorage. For local use only — don't save it on shared machines.",
-  "settings.endpoint": "Endpoint",
-  "settings.useProxy": "Enable reverse proxy (bypass CORS)",
-  "settings.proxyOrigin": "Proxy origin",
-  "settings.proxyPlaceholder": "Leave empty for same-origin proxy",
-  "settings.proxyHint": "TypeSafe official API disallows direct browser CORS. A built-in proxy is provided: leave empty when running on Cloudflare, Vite dev server, Docker, or npm start.",
-  "settings.mockMode": "Demo mode (no real API calls)",
   "settings.protocol": "Protocol",
   "settings.protocol.openai": "OpenAI-compatible",
   "settings.protocol.response": "OpenAI Responses",
@@ -220,7 +213,6 @@ export const en: Dictionary = {
   "ai.scoreLevels": "{count} levels",
   "ai.apply": "Apply to editor",
   "ai.applyReplaceConfirm": "The current project already has content. Applying will replace it. Continue?",
-  "ai.mockHint": "LLM demo mode: returns a built-in example. Configure a real model in Settings → LLM API.",
   "ai.errorGenerate": "AI generation failed: {message}",
 
   // templates

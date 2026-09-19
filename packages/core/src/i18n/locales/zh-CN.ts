@@ -142,8 +142,6 @@ export const zhCN: Dictionary = {
   "response.sending": "请求中…",
   "response.retrying": "第 {attempt} 次自动重试,{ms} ms 后",
   "response.empty": "点击「发送」评估当前请求。响应将以可视化卡片展示。",
-  "response.mockOn": "演示模式:返回文档示例响应,不会真实调用 API。可在设置中关闭。",
-  "response.mockBadge": "演示",
   "response.errorTitle": "请求失败",
   "response.usage": "输入 {input} / 输出 {output} tokens",
   "response.elapsed": "耗时 {ms} ms",
@@ -169,7 +167,8 @@ export const zhCN: Dictionary = {
   "error.http429": "触发限流(429),已自动退避重试仍失败。请稍后再试。",
   "error.http529": "服务端过载(529),已自动退避重试仍失败。请稍后再试。",
   "error.httpOther": "请求失败(HTTP {status}):{message}",
-  "error.network": "网络错误:无法连接到端点。若浏览器 CORS 受限,请在设置中开启本地代理并运行 npm run proxy。",
+  "error.network": "网络错误:无法连接到内置反代。请确认开发服务(npm run dev)、单进程服务(npm start)或部署环境正常运行。",
+  "error.missingKey": "Jev API Key 未配置,请先在右上角「设置 → Jev API」中填写 Key 后再发送。",
 
   // settings
   "settings.title": "设置",
@@ -181,12 +180,6 @@ export const zhCN: Dictionary = {
   "settings.presetNone": "— 选择 —",
   "settings.apiKey": "API Key",
   "settings.apiKeyRisk": "Key 以明文保存在浏览器 localStorage,仅本机使用,请勿在共享设备上保存。",
-  "settings.endpoint": "Endpoint",
-  "settings.useProxy": "启用反向代理(绕过 CORS)",
-  "settings.proxyOrigin": "代理地址",
-  "settings.proxyPlaceholder": "留空使用同源内置反代",
-  "settings.proxyHint": "TypeSafe 官方 API 限制浏览器直接跨域。本工具已内置反代:在 Cloudflare、Vite 开发环境、Docker 或本地运行 npm start 时留空即可直接使用同源反代。",
-  "settings.mockMode": "演示模式(不真实调用)",
   "settings.protocol": "协议",
   "settings.protocol.openai": "OpenAI 兼容",
   "settings.protocol.response": "OpenAI Responses",
@@ -218,7 +211,6 @@ export const zhCN: Dictionary = {
   "ai.scoreLevels": "{count} 个等级",
   "ai.apply": "应用到编辑器",
   "ai.applyReplaceConfirm": "当前项目已有内容,应用将以新项目替换当前项目。继续?",
-  "ai.mockHint": "LLM 演示模式:返回内置示例。可在设置 → LLM API 中配置真实模型。",
   "ai.errorGenerate": "AI 生成失败:{message}",
 
   // templates

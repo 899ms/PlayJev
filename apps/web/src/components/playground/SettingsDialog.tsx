@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input, Label, Badge } from "@/components/ui/field";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { downloadJson, pickJsonFile } from "@/lib/adapters";
 
@@ -189,9 +188,6 @@ function JevTab() {
           onChange={(e) => setJev({ apiKey: e.target.value })}
         />
       </Row>
-      <Row label={t("settings.endpoint")}>
-        <Input className="font-mono text-xs" value={jev.endpoint} onChange={(e) => setJev({ endpoint: e.target.value })} />
-      </Row>
       <Row label={t("topbar.model")} hint={t("settings.modelHint")}>
         <Input
           className="font-mono text-xs"
@@ -205,12 +201,6 @@ function JevTab() {
           <option value="jev-1.13.0" />
         </datalist>
       </Row>
-      <ProxyRows
-        useProxy={jev.useProxy}
-        proxyOrigin={jev.proxyOrigin}
-        onUseProxy={(v) => setJev({ useProxy: v })}
-        onProxyOrigin={(v) => setJev({ proxyOrigin: v })}
-      />
     </div>
   );
 }
@@ -259,41 +249,6 @@ function LlmTab() {
       <Row label={t("settings.model")}>
         <Input className="font-mono text-xs" value={llm.model} onChange={(e) => setLlm({ model: e.target.value })} />
       </Row>
-      <ProxyRows
-        useProxy={llm.useProxy}
-        proxyOrigin={llm.proxyOrigin}
-        onUseProxy={(v) => setLlm({ useProxy: v })}
-        onProxyOrigin={(v) => setLlm({ proxyOrigin: v })}
-      />
     </div>
-  );
-}
-
-function ProxyRows({
-  useProxy,
-  proxyOrigin,
-  onUseProxy,
-  onProxyOrigin,
-}: {
-  useProxy: boolean;
-  proxyOrigin: string;
-  onUseProxy: (v: boolean) => void;
-  onProxyOrigin: (v: string) => void;
-}) {
-  const t = useT();
-  return (
-    <Row label={t("settings.useProxy")} hint={t("settings.proxyHint")}>
-      <div className="flex items-center gap-3">
-        <Switch checked={useProxy} onCheckedChange={onUseProxy} />
-        {useProxy && (
-          <Input
-            className="h-7 w-64 font-mono text-xs"
-            placeholder={t("settings.proxyPlaceholder")}
-            value={proxyOrigin}
-            onChange={(e) => onProxyOrigin(e.target.value)}
-          />
-        )}
-      </div>
-    </Row>
   );
 }

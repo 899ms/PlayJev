@@ -152,11 +152,11 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
 
 ### 4.6 Playground(发送与响应可视化)
 
-- **发送配置**:API key 存 localStorage(默认掩码,不上传);endpoint 可改 ——
-  默认 `https://api.typesafe.ai/v1/systemone`,可指向本地代理或 SDK mock。
-- **CORS 对策**:浏览器直连 api.typesafe.ai 是否放行未知,不赌。项目附带一个约 30 行的
-  Node 代理 `npm run proxy`(开发环境用 Vite proxy,独立运行用 node 脚本转发并保留
-  `retry-after`/429 处理)。直连失败时 UI 给出明确引导。
+- **发送配置**:API key 存 localStorage(默认掩码,不上传);请求固定走同源内置反代
+  `POST /api/jev/systemone`(上游 `https://api.typesafe.ai/v1/systemone`),无任何可切换项。
+- **CORS 对策**:不直连——同源反代由四种宿主挂载:Vite 开发插件(`npm run dev`)、
+  单进程 Node 服务(`npm start`/`server/proxy.mjs`,同时托管静态构建)、nginx/docker、
+  Cloudflare(`server/worker.ts` + `functions/api/`)。直连/自定义代理分支已删除。
 - **响应可视化**(对应 api.md Answer types 与 confidence.md 三区间模式):
   - Noul:0–1 水平概率条,标出落点;0.5 附近显示"不确定"。
   - Choice:胜出项高亮 + 每个选项的概率条形图 + confidence 徽章。
@@ -165,7 +165,7 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
     阈值在设置里可调,默认 0.9 / 0.5(confidence.md 示例)。
 - **请求历史**:每个项目保留最近 N 次运行(state、请求、响应、usage),可对比两次
   运行的答案差异 —— 调 criteria 时必用。
-- **Mock 模式**:无 key 时返回预置响应(取自文档示例),方便演示和开发响应 UI。
+- **无演示/mock 模式**:未配 key 时发送按钮给出明确的缺 key 提示,不返回假数据。
 
 ### 4.7 模板库
 
@@ -181,7 +181,7 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
 
 ## 5. 技术选型
 
-纯前端单页应用,零后端依赖(Playground 代理除外):
+纯前端单页应用,网络层固定走同源反代(各宿主内置,前端零配置):
 
 | 层 | 选择 | 理由 |
 | --- | --- | --- |
@@ -193,8 +193,8 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
 | 编辑器 | P0 textarea;P1 换 CodeMirror 6(JSON 高亮+校验) | P0 控制依赖 |
 | 树组件 | 自写(P0 只读)+ 增删改(P1) | state 树操作逻辑需与路径生成强耦合,自写更稳 |
 
-不选桌面框架(Tauri/Electron):目标用户在开发流程中使用,浏览器 + 本地代理足够,
-发布形态是纯静态站点。
+不选桌面框架(Tauri/Electron):目标用户在开发流程中使用,浏览器 + 同源反代足够,
+本地 `npm start` 单进程点开即用,线上用 Cloudflare 部署。
 
 ## 6. 持久化与项目文件
 
@@ -212,7 +212,7 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
 
 | 阶段 | 内容 | 状态 |
 | --- | --- | --- |
-| **P0(已交付)** | monorepo 脚手架;core 包(types/zod/serialize/双格式导入/lint 全规则/CJK token 估算/statetree 含可视化编辑 ops/模板/i18n 中英/LLM 客户端/Jev 客户端+mock/store 工厂);Web 端:三栏布局、State 三模式(**树模式为完整可视化编辑器**:键/值/类型内联编辑、增删、排序、根形态转换,编辑层强制字段名非空唯一)、三种问题编辑器、请求实时预览、Playground(双 API 设置/本地代理/退避重试/答案可视化卡片/演示模式)、AI 生成向导(描述→澄清选择题→草稿→应用)、导入/导出、62 个单测 | ✅ 2026-09-19,vitest 全绿 + 浏览器全流程走查通过 |
+| **P0(已交付)** | monorepo 脚手架;core 包(types/zod/serialize/双格式导入/lint 全规则/CJK token 估算/statetree 含可视化编辑 ops/模板/i18n 中英 + 繁日/LLM 客户端(三协议:chat/responses/anthropic)/Jev 客户端/store 工厂);Web 端:State 三模式(**树模式为完整可视化编辑器**)、三种问题编辑器、请求实时预览、Playground(双 API 设置/key+模型/固定同源反代/退避重试/答案可视化卡片)、AI 生成向导(描述→澄清选择题+手动输入→草稿→应用/复制 Schema 给 Agent)、导入/导出 | ✅ 2026-09-19,vitest 全绿 + 浏览器全流程走查通过 |
 | **P1 提效** | instructions 内插入路径助手;EntryType 结构化编辑(含发票抽取等结构化模板);cURL/Python/TS 代码导出;dnd-kit 拖拽排序;CodeMirror 6;运行历史与对比;语言切换入口进顶栏 | 待开工(树可视化编辑已随 P0 提前交付) |
 | **P2 多端与生态** | apps/mobile(Expo + react-native-reusables,复用 core);apps/desktop(Tauri 壳);cookbooks 模板扩充;多项目管理;分享链接(URL 压缩编码);置信度阈值助手 | 待开工 |
 
@@ -220,7 +220,7 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
 
 | 风险 | 对策 |
 | --- | --- |
-| 浏览器直连 API 可能被 CORS 拦 | 内置本地代理;UI 明确区分"构建失败"与"网络失败" |
+| 浏览器直连 API 可能被 CORS 拦 | 不直连:所有流量固定走同源反代,四种宿主(Vite/单进程/docker/CF)全覆盖 |
 | token 估算不准 | 明确标注"估算";以响应 `usage.input_tokens` 回填历史记录校准 |
 | questions map 键序在导出转 map 时依赖 JSON 序列化顺序 | TS 规范保证 string 键按插入序;导出测试断言键序 |
 | 官方 API schema 演进(version/新字段) | `JevProject.version` 字段 + 导入迁移函数;zod 宽进严出 |

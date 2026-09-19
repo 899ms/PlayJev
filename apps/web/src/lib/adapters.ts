@@ -1,4 +1,4 @@
-import type { KeyValueStorage } from "@playjev/core";
+import { LLM_PROXY_PATH, type KeyValueStorage } from "@playjev/core";
 
 /** Web implementations of the core platform seams. */
 
@@ -6,6 +6,19 @@ export const webStorage: KeyValueStorage = {
   getItem: (name) => localStorage.getItem(name),
   setItem: (name, value) => localStorage.setItem(name, value),
   removeItem: (name) => localStorage.removeItem(name),
+};
+
+/**
+ * Same-origin LLM proxy fetch: forwards any provider URL through /api/llm
+ * (the real provider URL travels in a request header consumed by the
+ * same-origin proxy), so the browser never hits provider CORS.
+ * Mounted by every host: Vite dev plugin, npm start, nginx/docker,
+ * Cloudflare worker/functions.
+ */
+export const proxiedFetch: typeof fetch = async (input, init) => {
+  const headers = new Headers(init?.headers);
+  headers.set("x-llm-target", String(input));
+  return fetch(LLM_PROXY_PATH, { ...init, headers });
 };
 
 export async function copyText(text: string): Promise<boolean> {

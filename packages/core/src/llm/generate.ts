@@ -51,11 +51,12 @@ export interface GenerateContext {
   signal?: AbortSignal;
 }
 
+/**
+ * All LLM traffic goes through the same-origin reverse proxy (/api/llm).
+ * Routing is injected via ctx.fetchImpl (web passes proxiedFetch, tests pass
+ * a stub) — generate.ts itself never branches on proxy settings.
+ */
 function clientConfig(settings: LlmApiSettings): LlmClientConfig {
-  if (settings.useProxy) {
-    const origin = settings.proxyOrigin?.trim() ? settings.proxyOrigin.replace(/\/+$/, "") : "";
-    return { ...settings, baseUrl: `${origin}/api/llm` };
-  }
   return settings;
 }
 
@@ -64,8 +65,8 @@ export async function generateClarify(
   input: { description: string; locale: "zh-CN" | "zh-TW" | "en" | "ja"; includeCurrent: boolean; currentProjectJson?: string }
 ): Promise<ClarifyQuestion[]> {
   const cfg = clientConfig(ctx.settings);
-  if (!cfg.apiKey && !ctx.settings.useProxy) {
-    throw new LlmError("LLM API Key 未配置，请在设置中填写 API Key 或开启本地代理。");
+  if (!cfg.apiKey) {
+    throw new LlmError("LLM API Key 未配置，请在设置 → LLM API 中填写 Key 后重试。");
   }
   const messages = buildClarifyMessages(input);
   let reply = await chatComplete(cfg, messages, { fetchImpl: ctx.fetchImpl, signal: ctx.signal });
@@ -103,8 +104,8 @@ export async function generateDraft(
   }
 ): Promise<JevProject> {
   const cfg = clientConfig(ctx.settings);
-  if (!cfg.apiKey && !ctx.settings.useProxy) {
-    throw new LlmError("LLM API Key 未配置，请在设置中填写 API Key 或开启本地代理。");
+  if (!cfg.apiKey) {
+    throw new LlmError("LLM API Key 未配置，请在设置 → LLM API 中填写 Key 后重试。");
   }
   const messages = buildDraftMessages(input);
   let reply = await chatComplete(cfg, messages, { fetchImpl: ctx.fetchImpl, signal: ctx.signal, temperature: 0.4 });
