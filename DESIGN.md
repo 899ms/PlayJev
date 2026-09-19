@@ -154,8 +154,8 @@ token 估算用启发式(英文 ≈ 4 字符/-token,CJK ≈ 1 字符/token),顶�
 
 - **发送配置**:API key 存 localStorage(默认掩码,不上传);请求固定走同源内置反代
   `POST /api/jev/systemone`(上游 `https://api.typesafe.ai/v1/systemone`),无任何可切换项。
-- **CORS 对策**:不直连——同源反代由四种宿主挂载:Vite 开发插件(`npm run dev`)、
-  单进程 Node 服务(`npm start`/`server/proxy.mjs`,同时托管静态构建)、nginx/docker、
+- **CORS 对策**:不直连——同源反代由三种宿主挂载:Vite 开发插件(`npm run dev`)、
+  单进程 Bun 服务(`npm start`/`server/proxy.mjs`,同时托管静态构建;Docker 单容器直跑)、
   Cloudflare(`server/worker.ts` + `functions/api/`)。直连/自定义代理分支已删除。
 - **响应可视化**(对应 api.md Answer types 与 confidence.md 三区间模式):
   - Noul:0–1 水平概率条,标出落点;0.5 附近显示"不确定"。

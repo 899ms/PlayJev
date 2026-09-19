@@ -59,7 +59,7 @@ docker compose up -d --build
 
 | 目标 | 做法 | 内置反代 |
 | --- | --- | --- |
-| Docker Compose | `docker compose up -d --build` | ✅ nginx → proxy 服务，零配置 |
+| Docker Compose | `docker compose up -d --build` | ✅ 单 Bun 容器，零配置 |
 | Cloudflare Workers | `npx wrangler deploy` | ✅ `server/worker.ts`（静态 + `/api/*`） |
 | Cloudflare Pages | 构建 `npm run build`，输出 `apps/web/dist` | ✅ `functions/api/*` 自动挂载 |
 | Node 单进程 | `npm run build && npm start` | ✅ `server/proxy.mjs` 内置 |

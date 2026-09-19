@@ -1,4 +1,4 @@
-# ---- build stage: compile the web app (workspaces) ----
+# Single-process image: build the web app, then serve it + /api/* proxy with bun.
 FROM oven/bun:1 AS build
 WORKDIR /app
 
@@ -10,8 +10,10 @@ RUN bun install
 COPY . .
 RUN bun --filter @playjev/web build
 
-# ---- runtime stage: nginx serves the static build and routes /api to the proxy ----
-FROM nginx:1.27-alpine
-COPY --from=build /app/apps/web/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+FROM oven/bun:1
+WORKDIR /app
+COPY --from=build /app/apps/web/dist ./apps/web/dist
+COPY server ./server
+ENV PORT=80 HOST=0.0.0.0
 EXPOSE 80
+CMD ["bun", "server/proxy.mjs"]

@@ -3,19 +3,4 @@ services:
     build: .
     ports:
       - "${PLAYJEV_PORT:-10010}:80"
-    depends_on:
-      - proxy
-    restart: unless-stopped
-
-  # Forwards /api/jev/* to api.typesafe.ai and /api/llm to any LLM provider
-  # (target passed via the x-llm-target header by the web app).
-  proxy:
-    image: oven/bun:1
-    working_dir: /app
-    volumes:
-      - ./server:/app/server:ro
-    command: bun server/proxy.mjs
-    environment:
-      PORT: "8787"
-      HOST: 0.0.0.0
     restart: unless-stopped

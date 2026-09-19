@@ -59,7 +59,7 @@ docker compose up -d --build
 
 | Target | How | Reverse proxy |
 | --- | --- | --- |
-| Docker Compose | `docker compose up -d --build` | ✅ nginx → proxy service, zero config |
+| Docker Compose | `docker compose up -d --build` | ✅ single Bun container, zero config |
 | Cloudflare Workers | `npx wrangler deploy` | ✅ `server/worker.ts` (static + `/api/*`) |
 | Cloudflare Pages | build `npm run build`, output `apps/web/dist` | ✅ `functions/api/*` auto-attached |
 | Node single-process | `npm run build && npm start` | ✅ built into `server/proxy.mjs` |
