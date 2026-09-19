@@ -82,7 +82,6 @@ export { ja } from "./i18n/locales/ja";
 // jev client
 export { evaluate, defaultBackoffMs, errorKeyForStatus, extractServerMessage, JevApiError } from "./jev/client";
 export type { JevClientConfig, EvaluateOptions } from "./jev/client";
-export { mockEvaluate } from "./jev/mock";
 
 // llm
 export { PROVIDER_PRESETS } from "./llm/providers";

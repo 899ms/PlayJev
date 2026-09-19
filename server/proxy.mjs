@@ -24,7 +24,7 @@ const JEV_UPSTREAM = "https://api.typesafe.ai/v1/systemone";
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-llm-target, x-api-key, anthropic-version",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-jev-target, x-llm-target, x-api-key, anthropic-version",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -101,7 +101,9 @@ const server = http.createServer(async (req, res) => {
     const body = await readBody(req);
 
     if (url.pathname === "/api/jev/systemone") {
-      const upstream = await fetch(JEV_UPSTREAM, {
+      const rawTarget = req.headers["x-jev-target"];
+      const target = typeof rawTarget === "string" && /^https?:\/\//.test(rawTarget) ? rawTarget : JEV_UPSTREAM;
+      const upstream = await fetch(target, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

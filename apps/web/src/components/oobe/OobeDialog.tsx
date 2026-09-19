@@ -111,6 +111,15 @@ export function OobeDialog() {
                 onChange={(e) => settings.setJev({ apiKey: e.target.value })}
               />
             </div>
+            <div className="flex flex-col gap-1">
+              <Label>{t("settings.baseUrl")}</Label>
+              <Input
+                className="font-mono text-xs"
+                placeholder="https://api.typesafe.ai/v1/systemone"
+                value={settings.jev.baseUrl}
+                onChange={(e) => settings.setJev({ baseUrl: e.target.value })}
+              />
+            </div>
           </div>
         )}
 

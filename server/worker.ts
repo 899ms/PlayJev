@@ -7,7 +7,7 @@ export interface Env {
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-llm-target, x-api-key, anthropic-version",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-jev-target, x-llm-target, x-api-key, anthropic-version",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -26,7 +26,9 @@ export default {
       try {
         const body = await request.text();
         const auth = request.headers.get("authorization");
-        const upstream = await fetch("https://api.typesafe.ai/v1/systemone", {
+        const rawTarget = request.headers.get("x-jev-target");
+        const target = rawTarget && /^https?:\/\//.test(rawTarget) ? rawTarget : "https://api.typesafe.ai/v1/systemone";
+        const upstream = await fetch(target, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

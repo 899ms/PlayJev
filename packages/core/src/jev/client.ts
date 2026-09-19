@@ -19,9 +19,13 @@ export class JevApiError extends Error {
 }
 
 export interface JevClientConfig {
+  /** Same-origin proxy path. The browser never calls TypeSafe directly. */
   endpoint: string;
-  /** May be empty when talking to a proxy that injects the key, or in mock mode. */
-  apiKey?: string;
+  /** Sent as `Authorization: Bearer <key>` to the same-origin proxy. */
+  apiKey: string;
+  /** Real Jev upstream (e.g. custom mirror). Carried to the proxy via the
+   * `x-jev-target` header; servers fall back to the official upstream. */
+  baseUrl?: string;
 }
 
 export interface EvaluateOptions {
@@ -86,6 +90,7 @@ export async function evaluate(
       headers: {
         "Content-Type": "application/json",
         ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
+        ...(cfg.baseUrl ? { "x-jev-target": cfg.baseUrl } : {}),
       },
       body: JSON.stringify(request),
       signal: opts?.signal,

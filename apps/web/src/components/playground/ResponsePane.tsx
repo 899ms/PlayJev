@@ -49,7 +49,7 @@ export function ResponsePane({ className }: { className?: string }) {
     const started = performance.now();
     try {
       const response = await evaluate(
-        { endpoint: JEV_PROXY_PATH, apiKey: jev.apiKey },
+        { endpoint: JEV_PROXY_PATH, apiKey: jev.apiKey, baseUrl: jev.baseUrl },
         request,
         {
           onRetry: (attempt, delayMs) =>

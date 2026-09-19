@@ -201,6 +201,14 @@ function JevTab() {
           <option value="jev-1.13.0" />
         </datalist>
       </Row>
+      <Row label={t("settings.baseUrl")} hint={t("settings.jevBaseUrlHint")}>
+        <Input
+          className="font-mono text-xs"
+          placeholder="https://api.typesafe.ai/v1/systemone"
+          value={jev.baseUrl}
+          onChange={(e) => setJev({ baseUrl: e.target.value })}
+        />
+      </Row>
     </div>
   );
 }

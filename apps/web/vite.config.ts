@@ -17,7 +17,12 @@ function devProxyPlugin(): Plugin {
             for await (const chunk of req) chunks.push(chunk as Buffer);
             const body = Buffer.concat(chunks);
             const auth = req.headers.authorization;
-            const upstream = await fetch("https://api.typesafe.ai/v1/systemone", {
+            const rawTarget = req.headers["x-jev-target"];
+            const target =
+              typeof rawTarget === "string" && /^https?:\/\//.test(rawTarget)
+                ? rawTarget
+                : "https://api.typesafe.ai/v1/systemone";
+            const upstream = await fetch(target, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

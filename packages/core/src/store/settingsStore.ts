@@ -7,6 +7,8 @@ export interface JevApiSettings {
   apiKey: string;
   /** Model sent with every request; selected in Settings (docs/jev/models.md). */
   model: string;
+  /** Real Jev upstream. Never called directly — always via same-origin /api/jev/systemone. */
+  baseUrl: string;
 }
 
 export type LlmProtocol = "openai" | "response" | "anthropic";
@@ -50,6 +52,7 @@ export const DEFAULT_CONFIDENCE_LOW = 0.5;
 export const DEFAULT_JEV_SETTINGS: JevApiSettings = {
   apiKey: "",
   model: "jev-latest",
+  baseUrl: DEFAULT_JEV_UPSTREAM,
 };
 
 export const DEFAULT_LLM_SETTINGS: LlmApiSettings = {
@@ -89,6 +92,7 @@ export function createSettingsStore(storage: KeyValueStorage) {
             jev: {
               apiKey: (oldJev.apiKey as string) ?? "",
               model: (oldJev.model as string) ?? DEFAULT_JEV_SETTINGS.model,
+              baseUrl: (oldJev.baseUrl as string) ?? DEFAULT_JEV_SETTINGS.baseUrl,
             },
             llm: {
               protocol: (oldLlm.protocol as LlmApiSettings["protocol"]) ?? DEFAULT_LLM_SETTINGS.protocol,

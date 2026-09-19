@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { chatComplete, extractJsonBlock, LlmError } from "./client";
 import { defaultBackoffMs } from "../jev/client";
-import { mockEvaluate } from "../jev/mock";
-import type { JevRequest } from "../types/api";
 
 describe("extractJsonBlock", () => {
   it("parses a bare JSON object", () => {
@@ -102,25 +100,5 @@ describe("defaultBackoffMs", () => {
   it("falls back to exponential backoff", () => {
     expect(defaultBackoffMs(0, null)).toBe(1000);
     expect(defaultBackoffMs(1, null)).toBe(2000);
-  });
-});
-
-describe("mockEvaluate", () => {
-  it("answers every question with the right answer type", () => {
-    const request: JevRequest = {
-      state: "s",
-      model: "jev-latest",
-      questions: {
-        c: { type: "choice", instructions: "?", criteria: { a: "x", b: "y" } },
-        s: { type: "score", instructions: "?", criteria: ["l0", "l1", "l2"] },
-        n: { type: "noul", instructions: "?" },
-      },
-    };
-    const res = mockEvaluate(request);
-    expect(Object.keys(res.answers)).toEqual(["c", "s", "n"]);
-    expect(res.answers["c"]!.type).toBe("choice");
-    expect(res.answers["s"]!.type).toBe("score");
-    expect(res.answers["n"]!.type).toBe("noul");
-    expect(res.usage?.input_tokens).toBeGreaterThan(0);
   });
 });

@@ -102,5 +102,5 @@ docs/jev/         TypeSafe 官方文档 Markdown 镜像(2026-09 抓取)
 
 ```bash
 npx vitest run    # 44 个用例:serialize 往返、lint 每条规则、token 边界、
-                  # 模板序列化与文档示例一致、LLM JSON 提取/重试、mock 响应
+                  # 模板序列化与文档示例一致、LLM JSON 提取/重试、LLM 多协议解析
 ```
