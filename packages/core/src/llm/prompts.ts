@@ -29,10 +29,20 @@ export function buildClarifyMessages(input: ClarifyInput): LlmMessage[] {
             : input.locale === "fr"
               ? "French (Français)"
               : "English";
-  const system = `You help a developer design inputs for the TypeSafe "Jev" System One API.
-The user will describe what they want to evaluate. Before producing anything, ask 2 to 4 short
-multiple-choice clarifying questions that materially change the design of the questions
-(e.g. which categories, how many score levels, yes/no vs multi-way, what the state will contain).
+  const system = `You help a developer design the REQUEST BODY for the TypeSafe "Jev" System One API
+(state + typed questions: choice / score / noul). You are NOT deciding the user's business
+outcome — you are asking how to STRUCTURE the request so Jev can decide it.
+
+Ask 2 to 4 short multiple-choice clarifying questions about REQUEST CONSTRUCTION ONLY:
+- question type per judgment (choice = pick from options, score = rate along levels, noul = yes/no probability)
+- state shape (plain text vs object with named fields; which fields matter)
+- choice option sets (which fixed categories; always include an "other" escape hatch)
+- score granularity (how many levels, 2-10; describe situations, not bare numbers)
+- which judgments to split into separate atomic questions vs combine in code
+
+NEVER ask about business facts, policies, thresholds, or domain decisions the user must make
+(e.g. do NOT ask "what is your refund policy?", "which department handles X?", "what counts as urgent?").
+If business content is unclear, pick a sensible placeholder and note the user can edit it in the builder.
 All human-readable text you output MUST be written in ${languageName}.
 
 Reply with ONLY a JSON object, no prose, in this exact shape:

@@ -1,21 +1,22 @@
-import { ListChecks, CircleCheck, Gauge, Plus } from "lucide-react";
+import { ListChecks, CircleCheck, Gauge } from "lucide-react";
 import type { QuestionTab, QuestionType } from "@playjev/core";
 import { useProject, useT, useActions } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { QuestionCard } from "./QuestionCard";
 import { cn } from "@/lib/utils";
 
+const ADD_BUTTONS: { type: QuestionType; icon: typeof ListChecks; iconClass: string; labelKey: string }[] = [
+  { type: "choice", icon: ListChecks, iconClass: "text-indigo-500", labelKey: "questions.addChoice" },
+  { type: "score", icon: Gauge, iconClass: "text-amber-500", labelKey: "questions.addScore" },
+  { type: "noul", icon: CircleCheck, iconClass: "text-emerald-500", labelKey: "questions.addNoul" },
+];
+
 /**
  * Questions section: builder (visual cards) ⇄ questions-JSON editing.
- * Adding questions goes through a dropdown menu.
+ * Adding questions uses always-visible type buttons (works with mouse and touch;
+ * a dropdown menu misbehaves on mobile / inside overflow containers).
  */
 export function QuestionSection({ className }: { className?: string }) {
   const t = useT();
@@ -26,25 +27,12 @@ export function QuestionSection({ className }: { className?: string }) {
     <section className={cn("flex min-h-0 flex-1 flex-col", className)}>
       <div className="mb-2 flex flex-wrap items-center justify-between gap-1">
         <h2 className="text-sm font-semibold text-zinc-800">{t("questions.title")}</h2>
-        <div className="flex items-center gap-1.5">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm">
-                <Plus size={14} /> {t("questions.add")}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => actions.addQuestion("choice")}>
-                <ListChecks size={14} className="text-indigo-500" /> {t("questions.addChoice")}
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => actions.addQuestion("score")}>
-                <Gauge size={14} className="text-amber-500" /> {t("questions.addScore")}
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => actions.addQuestion("noul")}>
-                <CircleCheck size={14} className="text-emerald-500" /> {t("questions.addNoul")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {ADD_BUTTONS.map(({ type, icon: Icon, iconClass, labelKey }) => (
+            <Button key={type} size="sm" variant="outline" onClick={() => actions.addQuestion(type)}>
+              <Icon size={14} className={iconClass} /> {t(labelKey)}
+            </Button>
+          ))}
           <Tabs
             value={questionTab}
             onValueChange={(id) => actions.setQuestionTab(id as QuestionTab)}
