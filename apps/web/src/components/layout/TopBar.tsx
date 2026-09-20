@@ -72,19 +72,19 @@ export function TopBar({
           size="sm"
           variant="outline"
           disabled={!canUndo}
-          title={`$<span className="hidden sm:inline">{t("history.undo")}</span> (Ctrl+Z)`}
+          title={`${t("history.undo")} (Ctrl+Z)`}
           onClick={() => store.getState().undo()}
         >
-          <Undo2 size={14} /> {t("history.undo")}
+          <Undo2 size={14} /> <span className="hidden sm:inline">{t("history.undo")}</span>
         </Button>
         <Button
           size="sm"
           variant="outline"
           disabled={!canRedo}
-          title={`$<span className="hidden sm:inline">{t("history.redo")}</span> (Ctrl+Y)`}
+          title={`${t("history.redo")} (Ctrl+Y)`}
           onClick={() => store.getState().redo()}
         >
-          <Redo2 size={14} /> {t("history.redo")}
+          <Redo2 size={14} /> <span className="hidden sm:inline">{t("history.redo")}</span>
         </Button>
         <Button
           size="sm"

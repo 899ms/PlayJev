@@ -33,7 +33,6 @@ export const ja: Dictionary = {
   "topbar.model": "モデル",
 
   // storage (top bar)
-  "sidebar.templates": "テンプレート",
   "sidebar.collapse": "サイドバーを折りたたむ",
   "sidebar.expand": "サイドバーを展開",
   "settings.tabFile": "インポート / エクスポート",
@@ -45,7 +44,6 @@ export const ja: Dictionary = {
   // storage (top bar)
   "storage.save": "保存",
   "storage.menu": "プロジェクト",
-  "storage.saved": "保存済み",
   "storage.empty": "保存されたプロジェクトはありません",
 
   // left/right panes

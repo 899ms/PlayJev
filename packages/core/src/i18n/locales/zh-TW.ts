@@ -33,7 +33,6 @@ export const zhTW: Dictionary = {
   "topbar.model": "模型",
 
   // storage (top bar)
-  "sidebar.templates": "範本",
   "sidebar.collapse": "收起側欄",
   "sidebar.expand": "展開側欄",
   "settings.tabFile": "匯入 / 匯出",
@@ -45,7 +44,6 @@ export const zhTW: Dictionary = {
   // storage (top bar)
   "storage.save": "儲存",
   "storage.menu": "專案",
-  "storage.saved": "已儲存",
   "storage.empty": "尚無已儲存的專案",
 
   // left/right panes

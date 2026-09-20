@@ -65,8 +65,7 @@ docker compose up -d --build
 | Node 单进程 | `npm run build && npm start` | ✅ `server/proxy.mjs` 内置 |
 | 纯静态托管 | dist 可打开，但**发送不可用**（TypeSafe 拦截浏览器直连 CORS） | ❌ 请用以上任一方式 |
 
-所有 API 流量固定走同源 `/api/jev/systemone` 与 `/api/llm`，
-直连与自定义代理已按设计移除。架构详见 [DESIGN.md](./DESIGN.md)。
+所有 API 请求均自动通过同源反向代理（`/api/jev/systemone` 与 `/api/llm`）转发，天然规避浏览器跨域限制。架构详见 [DESIGN.md](./DESIGN.md)。
 
 ## 🗺️ 项目结构
 

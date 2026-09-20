@@ -33,7 +33,6 @@ export const en: Dictionary = {
   "topbar.model": "Model",
 
   // storage (top bar)
-  "sidebar.templates": "Templates",
   "sidebar.collapse": "Collapse sidebar",
   "sidebar.expand": "Expand sidebar",
   "settings.tabFile": "Import / Export",
@@ -52,7 +51,6 @@ export const en: Dictionary = {
   // storage
   "storage.save": "Save",
   "storage.menu": "Projects",
-  "storage.saved": "Saved",
   "storage.empty": "No saved projects yet",
 
   // token gauge

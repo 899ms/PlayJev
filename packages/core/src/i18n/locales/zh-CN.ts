@@ -33,7 +33,6 @@ export const zhCN: Dictionary = {
   "topbar.model": "模型",
 
   // storage (top bar)
-  "sidebar.templates": "模板",
   "sidebar.collapse": "收起侧栏",
   "sidebar.expand": "展开侧栏",
   "settings.tabFile": "导入 / 导出",
@@ -50,7 +49,6 @@ export const zhCN: Dictionary = {
   // storage
   "storage.save": "保存",
   "storage.menu": "项目",
-  "storage.saved": "已保存",
   "storage.empty": "暂无保存的项目",
 
   // token gauge

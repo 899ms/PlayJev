@@ -65,9 +65,8 @@ docker compose up -d --build
 | Node single-process | `npm run build && npm start` | ✅ built into `server/proxy.mjs` |
 | Static-only hosts | dist works, **Send does not** (TypeSafe blocks browser CORS) | ❌ use one of the above instead |
 
-All API traffic is pinned to same-origin `/api/jev/systemone` and `/api/llm` —
-direct browser calls and custom proxy settings were removed on purpose.
-See [DESIGN.md](./DESIGN.md) for the architecture.
+All API traffic routes through the same-origin reverse proxy (`/api/jev/systemone` and `/api/llm`) to eliminate browser CORS limitations.
+See [DESIGN.md](./DESIGN.md) for architecture details.
 
 ## 🗺️ Project layout
 

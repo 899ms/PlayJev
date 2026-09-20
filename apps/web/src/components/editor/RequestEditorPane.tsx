@@ -4,8 +4,8 @@ import { QuestionSection } from "@/components/questions/QuestionList";
 import { cn } from "@/lib/utils";
 
 /**
- * Left column: build the request. 状态 (text/tree/JSON) and 问题 (builder/JSON)
- * are built as separate sections, per the docs' separation of state and questions.
+ * Left column: request builder containing the State pane (text/tree/JSON)
+ * and the Question section (builder/JSON).
  */
 export function RequestEditorPane({ className }: { className?: string }) {
   return (
