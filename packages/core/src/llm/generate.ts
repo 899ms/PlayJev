@@ -28,29 +28,21 @@ const clarifySchema = z.object({
     .max(6),
 });
 
-/** Hard cap on generated questions: the draft prompt asks for <=4, and anything
-over that is rejected so the repair retry (or truncation below) kicks in. */
-export const MAX_DRAFT_QUESTIONS = 4;
-
 const draftSchema = z.object({
   name: z.string().optional(),
   state: z.union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())]),
-  questions: z
-    .record(
-      z.string(),
-      z.union([
-        z.object({ type: z.literal("choice"), instructions: z.string(), criteria: z.record(z.string(), z.string()) }),
-        z.object({ type: z.literal("score"), instructions: z.string(), criteria: z.array(z.string()).min(2).max(10) }),
-        z.object({
-          type: z.literal("noul"),
-          instructions: z.string(),
-          criteria: z.object({ true: z.string().optional(), false: z.string().optional() }).optional(),
-        }),
-      ])
-    )
-    .refine((q) => Object.keys(q).length <= MAX_DRAFT_QUESTIONS, {
-      message: `Too many questions: at most ${MAX_DRAFT_QUESTIONS} allowed, keep the most decision-relevant ones.`,
-    }),
+  questions: z.record(
+    z.string(),
+    z.union([
+      z.object({ type: z.literal("choice"), instructions: z.string(), criteria: z.record(z.string(), z.string()) }),
+      z.object({ type: z.literal("score"), instructions: z.string(), criteria: z.array(z.string()).min(2).max(10) }),
+      z.object({
+        type: z.literal("noul"),
+        instructions: z.string(),
+        criteria: z.object({ true: z.string().optional(), false: z.string().optional() }).optional(),
+      }),
+    ])
+  ),
 });
 
 export interface GenerateContext {
@@ -127,15 +119,7 @@ export async function generateDraft(
     parsed = safeParseDraft(reply);
     if (!parsed.ok) throw new LlmError(parsed.error);
   }
-  let draft = draftSchema.parse(parsed.value);
-  // Repair retry still over budget (e.g. model ignored the refine error):
-  // truncate to the first MAX_DRAFT_QUESTIONS instead of failing the wizard.
-  const ids = Object.keys(draft.questions);
-  if (ids.length > MAX_DRAFT_QUESTIONS) {
-    const kept: typeof draft.questions = {};
-    for (const id of ids.slice(0, MAX_DRAFT_QUESTIONS)) kept[id] = draft.questions[id]!;
-    draft = { ...draft, questions: kept };
-  }
+  const draft = draftSchema.parse(parsed.value);
   return draftToProject(draft);
 }
 

@@ -77,17 +77,15 @@ export interface DraftInput {
 }
 
 const BEST_PRACTICES = `Authoring rules (from the TypeSafe docs):
-- QUESTION BUDGET: emit at most 4 questions total (fewer is better). Prefer 2-3. NEVER emit more than 4:
-  the request is rejected above that. One judgment = one question; do not fan one judgment out into
-  many near-duplicate questions.
-- TYPE DISCIPLINE (pick exactly one per judgment — never emit the same judgment twice):
-  - Mutually exclusive categories in ONE field -> ONE "choice" with all options (do NOT split each
-    option into its own yes/no question).
-  - Independent yes/no facts about DIFFERENT aspects -> one "noul" each, but only for aspects the
-    user's code will actually branch on. Do NOT invent speculative checks ("is X?", "is Y?", "is Z?")
-    that no code path consumes.
-  - A position on a spectrum -> ONE "score" (2-10 ordered levels), never several booleans per level.
-  - If two candidate questions would produce the same downstream action, keep only one.
+- SCOPE: the user's description decides how many questions to emit and what they cover.
+  If the user asks for N judgments, emit N questions. Do not pad with speculative extras,
+  and do not drop judgments the user asked for.
+- TYPE GUIDANCE (default mapping, the user's description wins on conflict):
+  - Mutually exclusive categories in ONE field -> ONE "choice" with all options (prefer this over
+    splitting each option into its own yes/no question, unless the user explicitly asks for that).
+  - Independent yes/no facts about DIFFERENT aspects -> one "noul" each, for aspects the user's
+    code will branch on.
+  - A position on a spectrum -> ONE "score" (2-10 ordered levels), not several booleans per level.
 - "choice": criteria is an object mapping option key -> description (string). Both keys and descriptions are sent to the model. Add an "other" escape hatch when the list may not cover every input. Use null only via omitting the description (keep descriptions as strings here).
 - "score": criteria is an ordered array of 2-10 level descriptions, low to high. Describe situations, not degrees; never bare numbers ("0","1","2" are useless); the model never sees level numbers or neighbors.
 - "noul": a yes/no question returning P(yes). Phrase it so a high value means "yes". Optional criteria { "true": "...", "false": "..." }.
@@ -109,7 +107,7 @@ export function buildDraftMessages(input: DraftInput): LlmMessage[] {
               ? "French (Français)"
               : "English";
   const system = `You design Jev (TypeSafe System One) request bodies and return them as JSON.
-Keep the request SMALL: at most 4 questions, ideally 2-3.
+Follow the user's description for scope and coverage: emit what they asked for, no more, no less.
 ${BEST_PRACTICES}
 All human-readable text (state, instructions, criteria, name) MUST be written in ${languageName}.
 The state you produce is an EXAMPLE for the user to replace with real data.

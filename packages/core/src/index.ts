@@ -92,5 +92,5 @@ export type { ProviderPreset } from "./llm/providers";
 export { chatComplete, extractJsonBlock, LlmError } from "./llm/client";
 export type { LlmMessage, LlmClientConfig, ChatOptions } from "./llm/client";
 export { buildClarifyMessages, buildDraftMessages } from "./llm/prompts";
-export { generateClarify, generateDraft, MAX_DRAFT_QUESTIONS } from "./llm/generate";
+export { generateClarify, generateDraft } from "./llm/generate";
 export type { ClarifyQuestion, GenerateContext } from "./llm/generate";

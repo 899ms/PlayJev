@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { buildDraftMessages } from "./prompts";
-import { MAX_DRAFT_QUESTIONS } from "./generate";
 
 const base = {
   description: "triage support tickets",
@@ -9,19 +8,17 @@ const base = {
   includeCurrent: false,
 };
 
-describe("draft question budget", () => {
-  it("caps generation at MAX_DRAFT_QUESTIONS", () => {
-    expect(MAX_DRAFT_QUESTIONS).toBe(4);
+describe("draft scope follows the user", () => {
+  it("system prompt defers scope to the user description", () => {
+    const [system] = buildDraftMessages(base);
+    expect(system.content).toContain("emit what they asked for, no more, no less");
+    expect(system.content).not.toContain("at most 4 questions");
+    expect(system.content).not.toContain("NEVER emit more than");
   });
 
-  it("system prompt states the 4-question cap", () => {
+  it("keeps type guidance without hard bans", () => {
     const [system] = buildDraftMessages(base);
-    expect(system.content).toContain("at most 4 questions");
-  });
-
-  it("system prompt bans fan-out duplicates", () => {
-    const [system] = buildDraftMessages(base);
-    expect(system.content).toContain("never emit the same judgment twice");
-    expect(system.content).toContain("Do NOT invent speculative checks");
+    expect(system.content).toContain("the user's description wins on conflict");
+    expect(system.content).not.toContain("never emit the same judgment twice");
   });
 });
