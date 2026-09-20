@@ -103,7 +103,7 @@ export const zhTW: Dictionary = {
   "questions.add": "新增問題",
   "questions.addChoice": "Choice — 從選項中選",
   "questions.addScore": "Score — 沿等級評分",
-  "questions.addNoul": "Noul — 是/否判斷",
+  "questions.addNoul": "Noul — 判斷",
   "questions.empty": "還沒有問題。透過「新增問題」開始,或用「AI 生成」從一段描述開始。",
   "question.tabBuilder": "建構器",
   "question.tabJson": "JSON",
@@ -117,9 +117,9 @@ export const zhTW: Dictionary = {
   "question.delete": "刪除問題",
   "question.moveUp": "上移",
   "question.moveDown": "下移",
-    "question.type.choice": "選擇",
+  "question.type.choice": "選擇",
   "question.type.score": "評分",
-  "question.type.noul": "是/否",
+  "question.type.noul": "判斷",
 "question.criteria": "候選答案",
 
   // choice editor

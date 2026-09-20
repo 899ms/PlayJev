@@ -101,7 +101,7 @@ export const zhCN: Dictionary = {
   "questions.add": "添加问题",
   "questions.addChoice": "Choice — 从选项中选",
   "questions.addScore": "Score — 沿等级打分",
-  "questions.addNoul": "Noul — 是/否判断",
+  "questions.addNoul": "Noul — 判断",
   "questions.empty": "还没有问题。通过「添加问题」开始,或用「AI 生成」从一段描述开始。",
   "question.tabBuilder": "构建器",
   "question.tabJson": "JSON",
@@ -115,9 +115,9 @@ export const zhCN: Dictionary = {
   "question.delete": "删除问题",
   "question.moveUp": "上移",
   "question.moveDown": "下移",
-    "question.type.choice": "选择",
+  "question.type.choice": "选择",
   "question.type.score": "评分",
-  "question.type.noul": "是/否",
+  "question.type.noul": "判断",
 "question.criteria": "候选答案",
 
   // choice editor
